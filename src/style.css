@@ -464,3 +464,45 @@
   .nav{background:#160d2f;isolation:isolate;box-shadow:0 14px 28px rgba(0,0,0,.35)}
   :root[data-theme="light"] .nav{background:#ffffff}
 }
+
+/* ================================================================
+   MOBILE OVERFLOW FIXES — Period & EDD calendars
+   Grid tracks were `1fr` (min-width:auto), so a nowrap badge such as
+   "♥ DUE DATE" widened every column and pushed the calendar past the
+   screen. The nav row (month label + "View…" buttons) also never wrapped.
+   ================================================================ */
+.page-wrap,.panel,.calendar-card{min-width:0;max-width:100%}
+.calendar-grid{grid-template-columns:repeat(7,minmax(0,1fr))}
+.cal-day-cell{min-width:0;overflow:hidden;padding:2px}
+.cal-badge{max-width:100%;overflow:hidden;text-overflow:clip}
+.calendar-title{min-width:0;flex:1 1 220px}
+.calendar-title span{min-width:0}
+.calendar-nav{flex-wrap:wrap;min-width:0;max-width:100%}
+.calc-results{grid-template-columns:repeat(2,minmax(0,1fr))}
+.calc-result{min-width:0}
+.calc-result b{overflow-wrap:anywhere}
+.form-grid label,.form-grid input{min-width:0}
+.form-grid input[type="date"]{-webkit-appearance:none;appearance:none;min-height:46px;display:block}
+/* Hover-zoom only on real pointers: on touch it "sticks" after a tap and
+   makes the selected tile grow over its neighbours. */
+@media (hover:none){.cal-day-cell:hover:not(.empty){transform:none;z-index:auto}}
+
+@media(max-width:650px){
+  .calendar-card{padding:14px 10px;border-radius:19px}
+  .calendar-top{flex-direction:column;align-items:stretch;gap:10px}
+  .calendar-title{flex:none;font-size:15px}
+  .calendar-nav{justify-content:space-between;gap:6px}
+  .cal-nav-btn{flex:none}
+  /* label + both arrows fill row 1, so the shortcuts wrap onto row 2 */
+  .cal-month-label{flex:1 1 calc(100% - 96px);min-width:0;font-size:14px;white-space:nowrap}
+  /* "View …" shortcuts get their own full-width row of equal chips */
+  .cal-jump-btn{flex:1 1 30%;align-self:stretch;min-width:0;padding:7px 4px;font-size:10.5px;white-space:normal;line-height:1.2}
+  .calendar-grid{gap:3px}
+  .cal-day-name{font-size:9.5px;letter-spacing:0;padding:6px 0}
+  .cal-day-cell{aspect-ratio:auto;height:46px;min-height:0;border-radius:9px;font-size:12px;justify-content:center;gap:3px}
+  /* Text labels can't fit in a ~45px tile: show a dot; the legend and the
+     result cards below give the meaning and exact dates. */
+  .cal-badge{font-size:0;width:6px;height:6px;margin:0;border-radius:50%;background:currentColor;opacity:.95}
+  .calendar-legend{gap:8px 12px}
+  .calc-results{grid-template-columns:minmax(0,1fr)}
+}
