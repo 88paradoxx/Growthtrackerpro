@@ -9,6 +9,7 @@ import {
 import { developmentalMilestones } from './milestones.js';
 import { assessmentAges } from './assessment.js';
 import DevScoring from './devscore.jsx';
+import { ReminderCard, ALARM, ymd } from './reminders.jsx';
 import { getTheme, applyTheme, syncFrames, THEME_EVENT } from './theme.js';
 import { PAGES } from './seo.js';
 import './style.css';
@@ -916,6 +917,21 @@ function PeriodPage({ onNavigate }) {
     };
   }, [parsedLmp, cycle, bleed, today]);
 
+  // Calendar reminders: the next three predicted periods (day before + morning of)
+  const periodReminders = useMemo(() => {
+    if (!cycleData) return [];
+    return [0, 1, 2]
+      .map((k) => addDays(cycleData.nextPeriodStart, k * cycle))
+      .filter((d) => d.getTime() >= today.getTime())
+      .map((d, i) => ({
+        uid: `period-${ymd(d)}`,
+        date: d,
+        title: i === 0 ? 'Period expected (predicted)' : 'Period expected (predicted, later cycle)',
+        description: `Predicted from a ${cycle}-day cycle in GrowVita. Dates can shift with stress, illness or travel; update after your next period starts.`,
+        alarms: [ALARM.dayBefore, ALARM.morningOf]
+      }));
+  }, [cycleData, cycle, today]);
+
   // Calendar Highlight Configuration
   const highlightConfig = useMemo(() => {
     if (!cycleData) return {};
@@ -1109,6 +1125,17 @@ function PeriodPage({ onNavigate }) {
           </section>
         )}
 
+        {cycleData && (
+          <ReminderCard
+            heading="Get reminded before your next period"
+            intro="Adds your next predicted periods to your phone’s calendar, with an alert the day before and on the morning of each one."
+            events={periodReminders}
+            primary={periodReminders[0]}
+            filename="growvita-period-reminders"
+            note="Predictions assume a regular cycle — after your next period starts, enter the new date and add the reminders again."
+          />
+        )}
+
         <Faq page="period" />
 
         <p className="note">
@@ -1172,6 +1199,27 @@ function EddPage({ onNavigate }) {
       trimester
     };
   }, [parsedLmp, today]);
+
+  // Calendar reminders for the final month and the due date
+  const eddReminders = useMemo(() => {
+    if (!eddData) return [];
+    const note = 'Estimated from the LMP (Naegele\'s rule). Only about 1 in 20 babies arrive on the due date; follow your obstetrician\'s advice.';
+    const list = [36, 37, 38, 39].map((w) => ({
+      uid: `edd-${ymd(eddData.edd)}-w${w}`,
+      date: addDays(parsedLmp, w * 7),
+      title: w === 36 ? 'Pregnancy 36 weeks — final month begins' : w === 37 ? 'Pregnancy 37 weeks — full term' : `Pregnancy ${w} weeks`,
+      description: `${w} weeks of pregnancy. Due date (EDD): ${fmtDate(eddData.edd)}. ${note}`,
+      alarms: [ALARM.morningOf]
+    }));
+    list.push({
+      uid: `edd-${ymd(eddData.edd)}-due`,
+      date: eddData.edd,
+      title: 'Expected due date (EDD)',
+      description: `40 weeks — expected date of delivery. ${note}`,
+      alarms: [ALARM.dayBefore, ALARM.morningOf]
+    });
+    return list.filter((e) => e.date.getTime() >= today.getTime());
+  }, [eddData, parsedLmp, today]);
 
   // Calendar Highlight Configuration for Pregnancy Milestones
   const highlightConfig = useMemo(() => {
@@ -1353,6 +1401,17 @@ function EddPage({ onNavigate }) {
               Select the first day of your last menstrual period (LMP) on the calendar above, type the date into the field, or choose a quick preset to view your estimated due date, gestational age, and trimester timeline.
             </p>
           </section>
+        )}
+
+        {eddData && (
+          <ReminderCard
+            heading="Reminders for the last month and the due date"
+            intro="Adds weeks 36–39 and your due date to your phone’s calendar, with an alert the day before and on the morning of the due date."
+            events={eddReminders}
+            primary={eddReminders.find((e) => e.uid.endsWith('-due'))}
+            filename="growvita-pregnancy-reminders"
+            note="If your doctor revises the due date after an ultrasound, update the date here and add the reminders again."
+          />
         )}
 
         <Faq page="edd" />

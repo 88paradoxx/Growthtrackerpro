@@ -630,3 +630,26 @@
 }
 .dq-note{margin:6px 0 0;font-size:13px;color:var(--dv-sub)}
 .dev-seg button{white-space:nowrap}.dev-score-col{width:300px}
+
+/* Calendar reminder card (src/reminders.jsx) */
+.reminder-card{margin-top:18px}
+.reminder-head{display:flex;gap:14px;align-items:flex-start}
+.reminder-head h2{margin:4px 0 6px}
+.reminder-head p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
+.reminder-icon{flex-shrink:0;display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#c33a8c,#6a2fd6);color:#fff}
+.reminder-list{list-style:none;margin:16px 0;padding:0;display:grid;gap:8px}
+.reminder-list li{display:grid;grid-template-columns:170px 1fr;gap:2px 14px;padding:10px 14px;border:1px solid rgba(208,157,255,.22);border-radius:12px;background:rgba(255,255,255,.03)}
+.reminder-list b{font-size:14px;color:var(--text)}
+.reminder-list span{font-size:14px;color:var(--text)}
+.reminder-list small{grid-column:2;font-size:12px;color:var(--muted)}
+.reminder-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.reminder-actions .primary{display:inline-flex;align-items:center;gap:8px;width:auto;margin:0}
+.reminder-actions .secondary-action{display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.reminder-note{margin:10px 0 0;font-size:12.5px;color:var(--muted);line-height:1.5}
+:root[data-theme="light"] .reminder-list li{background:#faf7ff;border-color:#e6dcf6}
+@media(max-width:650px){
+  .reminder-list li{grid-template-columns:1fr}
+  .reminder-list small{grid-column:1}
+  .reminder-actions .primary,.reminder-actions .secondary-action{width:100%;justify-content:center}
+}
+@media print{.reminder-card{display:none!important}}
