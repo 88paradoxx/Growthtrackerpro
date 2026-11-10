@@ -69,3 +69,22 @@ Checked against the CDC "Learn the Signs. Act Early." milestone lists (the pre-2
 | 48 m | "Discerning real from fantasy" | "Prefers playing with other children to playing alone" | **Error:** CDC says 4-year-olds *often can't* tell real from make-believe — it is a 5-year skill |
 | 60 m | — | + "Can tell what's real and what's make-believe" | Correct age for that skill |
 | 60 m | Fine Motor: fork & spoon only | + "Copies a triangle" | Standard 5-year fine-motor milestone |
+
+## Growth reference data (`public/growth-references.js`)
+The growth calculator previously used hand-entered yearly medians with constant L/S values and straight-line interpolation between birthdays. In infancy this put z-scores off by up to 2.3 SD (e.g. a 4-month-old boy at WHO +1 SD length scored +3.3 SD), and the 1-year weight medians were wrong (10.2 kg vs WHO 9.6 kg).
+
+It now uses:
+
+| Age | Reference | Notes |
+|---|---|---|
+| 0–60 months | **WHO Child Growth Standards 2006** | Official LMS, sampled daily for the first 2 weeks, weekly to 13 weeks, then monthly (max interpolation error 0.03 SD). Recumbent length under 2 y, standing height 2–5 y. Head circumference to 5 y. |
+| 5–18 years | **IAP 2015** (default) | Khadilkar et al., Indian Pediatr 2015;52:47–55. LMS fitted to the published percentile tables (`scripts/growth-data/iap2015-percentiles.txt`); reproduces every published percentile within 0.08 SD. |
+| 5–19 years | **WHO 2007** (selectable) | Official LMS. Weight-for-age only to 10 y (WHO does not publish it beyond). |
+
+Other corrections:
+- WHO restricted z-score method for weight and BMI beyond ±3 SD.
+- BMI categories follow the reference in use: WHO 0–5 y (>+1 risk, >+2 overweight, >+3 obese, <−2 wasting), WHO 5–19 y (>+1 overweight, >+2 obese, <−2 thinness), IAP 2015 (adult-equivalent 23 = overweight, 27 = obese). Previously the CDC 85th/95th centiles were applied at all ages.
+- Mid-parental target range is now ±8.5 cm (≈2 SD) instead of ±5 cm.
+- Fixed a missing reference at exactly 2 years 0 months.
+
+WHO tables were taken from the RCPCH `rcpchgrowth` package's copies of the official WHO files.

@@ -1130,6 +1130,13 @@ body[data-theme="light"] :is(.diet-tip,.insight-item) span:first-child{color:#0b
         </select>
       </div>
       <div class="form-group">
+        <label for="olderRef">Reference for 5–18 years</label>
+        <select id="olderRef" onchange="setOlderRef(this.value)">
+          <option value="iap2015">IAP 2015 (Indian children)</option>
+          <option value="who2007">WHO 2007</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label for="ageYears">Age <span style="color:#c2415d">*</span></label>
         <div class="age-parts">
           <div class="age-part">
@@ -1259,57 +1266,91 @@ body[data-theme="light"] :is(.diet-tip,.insight-item) span:first-child{color:#0b
   </div>
 
 
+<script src="growth-references.js"></script>
 <noscript><p style="text-align:center;padding:16px">GrowVita needs JavaScript to calculate centiles and draw charts.</p></noscript>
 <script>
 
   let currentChartType = 'height';
   let chartState = {};
-  const chartData = {
-    male: {
-      age: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
-      heightM: [49.9, 75.7, 87.1, 96.1, 103.3, 110.0, 116.0, 121.5, 127.0, 132.5, 137.5, 143.0, 149.0, 156.0, 162.0, 167.0, 171.0, 173.0, 173.5],
-      heightS: [0.038, 0.039, 0.040, 0.041, 0.042, 0.042, 0.042, 0.042, 0.043, 0.043, 0.044, 0.044, 0.043, 0.042, 0.041, 0.040, 0.039, 0.038, 0.038],
-      weightM: [3.3, 10.2, 12.2, 14.3, 16.3, 18.3, 20.5, 22.8, 25.3, 28.0, 31.0, 34.5, 39.0, 44.0, 49.0, 53.5, 57.0, 59.5, 61.0],
-      weightS: [0.14, 0.12, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.21, 0.20, 0.19, 0.18, 0.17, 0.16, 0.15],
-      bmiM: [13.4, 16.5, 16.0, 15.6, 15.3, 15.2, 15.3, 15.4, 15.7, 16.0, 16.4, 16.8, 17.3, 17.9, 18.5, 19.1, 19.6, 20.0, 20.3],
-      bmiS: [0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.09, 0.09, 0.10, 0.10, 0.11, 0.11, 0.12, 0.12, 0.12, 0.12, 0.11, 0.11, 0.11],
-      hcM: [34.5, 46.0, 48.3, 49.5, 50.3, 50.8],
-      hcS: [0.035, 0.032, 0.032, 0.031, 0.031, 0.031]
-    },
-    female: {
-      age: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
-      heightM: [49.1, 74.0, 85.7, 95.1, 102.7, 109.0, 115.0, 121.0, 126.5, 132.5, 138.0, 144.0, 149.5, 153.5, 156.0, 157.0, 158.0, 158.5, 158.5],
-      heightS: [0.038, 0.040, 0.041, 0.042, 0.043, 0.043, 0.043, 0.043, 0.043, 0.043, 0.043, 0.043, 0.042, 0.041, 0.040, 0.039, 0.039, 0.039, 0.039],
-      weightM: [3.2, 9.5, 11.5, 13.9, 16.1, 18.2, 20.5, 23.0, 26.0, 29.5, 33.0, 37.0, 41.0, 44.5, 47.5, 49.5, 50.5, 51.5, 52.0],
-      weightS: [0.14, 0.13, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.21, 0.20, 0.19, 0.18, 0.17, 0.16, 0.15, 0.15],
-      bmiM: [13.3, 16.1, 15.7, 15.3, 15.0, 14.9, 15.0, 15.2, 15.5, 15.9, 16.4, 16.9, 17.5, 18.0, 18.5, 19.0, 19.4, 19.7, 19.9],
-      bmiS: [0.08, 0.09, 0.09, 0.09, 0.09, 0.10, 0.10, 0.11, 0.11, 0.12, 0.12, 0.13, 0.13, 0.13, 0.12, 0.12, 0.11, 0.11, 0.11],
-      hcM: [33.9, 44.8, 47.1, 48.3, 49.1, 49.8],
-      hcS: [0.035, 0.032, 0.032, 0.032, 0.031, 0.031]
-    }
-  };
-  const lmsParams = {
-    male: { height: { L: 1.0 }, weight: { L: -0.2 }, bmi: { L: -1.5 }, hc: { L: 0.0 } },
-    female: { height: { L: 1.0 }, weight: { L: -0.25 }, bmi: { L: -1.5 }, hc: { L: 0.0 } }
-  };
-  function interpolate(age, ageArr, valArr) {
-    if (age <= ageArr[0]) return valArr[0];
-    if (age >= ageArr[ageArr.length - 1]) return valArr[valArr.length - 1];
-    for (let i = 0; i < ageArr.length - 1; i++) {
-      if (age >= ageArr[i] && age <= ageArr[i+1]) {
-        const t = (age - ageArr[i]) / (ageArr[i+1] - ageArr[i]);
-        return valArr[i] + t * (valArr[i+1] - valArr[i]);
-      }
-    }
+  /* ---------------------------------------------------------------
+   * Growth references (see growth-references.js)
+   *  0-5 y : WHO Child Growth Standards 2006 (recumbent length < 2 y,
+   *          standing height 2-5 y)
+   *  5-18 y: IAP 2015 (Indian children, default) or WHO 2007 reference
+   * ------------------------------------------------------------- */
+  const GV_REF = window.GV_GROWTH_REF;
+  const REF_KEY = 'growvita-growth-ref';
+  let olderRef = 'iap2015';
+  try { const r = localStorage.getItem(REF_KEY); if (r === 'who2007' || r === 'iap2015') olderRef = r; } catch (e) {}
+  function setOlderRef(v) {
+    olderRef = v === 'who2007' ? 'who2007' : 'iap2015';
+    try { localStorage.setItem(REF_KEY, olderRef); } catch (e) {}
+    evaluateGrowth(false);
   }
+  const REF_LABEL = { who: 'WHO 2006', iap2015: 'IAP 2015', who2007: 'WHO 2007' };
+  function refSourceFor(param, age) {
+    if (age <= 5) return 'who';           // WHO 2006 covers 0-60 months inclusive
+    return olderRef;
+  }
+  function lmsAt(rows, age) {
+    // tolerate ages within ~4 days of a table edge (e.g. exactly 2 y 0 m, where the height table starts on day 731)
+    if (!rows || !rows.length || age < rows[0][0] - 0.011 || age > rows[rows.length - 1][0] + 0.011) return null;
+    age = Math.min(Math.max(age, rows[0][0]), rows[rows.length - 1][0]);
+    let i = 0;
+    while (i < rows.length - 2 && rows[i + 1][0] < age) i++;
+    const a = rows[i], b = rows[i + 1] || a, t = b[0] === a[0] ? 0 : Math.min(1, Math.max(0, (age - a[0]) / (b[0] - a[0])));
+    return { L: a[1] + t * (b[1] - a[1]), M: a[2] + t * (b[2] - a[2]), S: a[3] + t * (b[3] - a[3]) };
+  }
+  // Returns {L, M, S, source} or null when the reference has no data for that age
   function getRef(gender, param, age) {
-    const data = chartData[gender];
-    const ageArr = param === 'hc' ? [0,1,2,3,4,5] : data.age;
-    return {
-      L: lmsParams[gender][param].L,
-      M: interpolate(age, ageArr, data[param + 'M']),
-      S: interpolate(age, ageArr, data[param + 'S'])
-    };
+    const src = refSourceFor(param, age);
+    let rows;
+    if (src === 'who') {
+      const t = GV_REF.who[gender][param];
+      if (!t) return null;
+      rows = age < 2 ? t.under2 : t.from2;
+    } else {
+      if (param === 'hc') return null;
+      rows = GV_REF[src][gender][param];
+      // 5.0 y exactly falls on the WHO 2006/2007 seam: use the older table's first row
+    }
+    const r = lmsAt(rows, age);
+    if (!r) return null;
+    r.source = src; r.param = param;
+    return r;
+  }
+  // WHO restricted LMS for weight and BMI beyond +/-3 SD (WHO Anthro method):
+  // the distance between 2 and 3 SD is used instead of extrapolating the skewed tail.
+  function calcZr(val, ref) {
+    const z = calcZ(val, ref.L, ref.M, ref.S);
+    if (!(ref.param === 'weight' || ref.param === 'bmi') || Math.abs(z) <= 3) return z;
+    const sd3 = valFromZ(z > 0 ? 3 : -3, ref.L, ref.M, ref.S), sd2 = valFromZ(z > 0 ? 2 : -2, ref.L, ref.M, ref.S);
+    const sd23 = Math.abs(sd3 - sd2);
+    return z > 0 ? 3 + (val - sd3) / sd23 : -3 + (val - sd3) / sd23;
+  }
+  // BMI-for-age classification follows the cut-offs of the reference in use
+  function bmiCategory(z, ref, gender) {
+    if (ref.source === 'who') {            // WHO 0-5 y
+      if (z > 3) return ['danger', 'Obesity (> +3 SD)'];
+      if (z > 2) return ['warning', 'Overweight (> +2 SD)'];
+      if (z > 1) return ['warning', 'Possible risk of overweight (> +1 SD)'];
+      if (z < -3) return ['danger', 'Severe wasting (< −3 SD)'];
+      if (z < -2) return ['danger', 'Wasting (< −2 SD)'];
+      return ['normal', 'Healthy weight'];
+    }
+    if (ref.source === 'who2007') {        // WHO 5-19 y
+      if (z > 2) return ['danger', 'Obesity (> +2 SD)'];
+      if (z > 1) return ['warning', 'Overweight (> +1 SD)'];
+      if (z < -3) return ['danger', 'Severe thinness (< −3 SD)'];
+      if (z < -2) return ['danger', 'Thinness (< −2 SD)'];
+      return ['normal', 'Healthy weight'];
+    }
+    // IAP 2015: adult-equivalent 23 and 27 cut-offs (boys ~71st/90th, girls ~75th/95th centile)
+    const ae23 = gender === 'male' ? 0.553 : 0.674, ae27 = gender === 'male' ? 1.2816 : 1.6449;
+    if (z >= ae27) return ['danger', 'Obesity (≥ adult-equivalent 27)'];
+    if (z >= ae23) return ['warning', 'Overweight (≥ adult-equivalent 23)'];
+    if (z < -1.8808) return ['danger', 'Thinness (< 3rd centile)'];
+    return ['normal', 'Healthy weight'];
   }
   function syncAgeParts() {
     const yearsInput = document.getElementById('ageYears');
@@ -1417,7 +1458,7 @@ body[data-theme="light"] :is(.diet-tip,.insight-item) span:first-child{color:#0b
     if (!isNaN(fatherHeight) && !isNaN(motherHeight)) {
       let targetH = (gender === 'male') ? (fatherHeight + (motherHeight + 13)) / 2 : ((fatherHeight - 13) + motherHeight) / 2;
       document.getElementById('mpthVal').innerText = `${targetH.toFixed(1)} cm`;
-      document.getElementById('mpthRange').innerText = `${(targetH - 5).toFixed(1)} cm to ${(targetH + 5).toFixed(1)} cm`;
+      document.getElementById('mpthRange').innerText = `${(targetH - 8.5).toFixed(1)} cm to ${(targetH + 8.5).toFixed(1)} cm`;
       mpthBanner.style.display = 'flex';
     } else {
       mpthBanner.style.display = 'none';
@@ -1428,7 +1469,7 @@ body[data-theme="light"] :is(.diet-tip,.insight-item) span:first-child{color:#0b
     const hLow = valFromZ(zNormLow, hRef.L, hRef.M, hRef.S);
     const hHigh = valFromZ(zNormHigh, hRef.L, hRef.M, hRef.S);
     if (!isNaN(heightVal)) {
-      const hZ = calcZ(heightVal, hRef.L, hRef.M, hRef.S);
+      const hZ = calcZr(heightVal, hRef);
       const hPct = normalCDF(hZ);
       let hTag = '<span class="tag tag-normal">Normal</span>';
       if (hPct < 3) hTag = '<span class="tag tag-danger">Short Stature (< 3rd)</span>';
@@ -1439,10 +1480,13 @@ body[data-theme="light"] :is(.diet-tip,.insight-item) span:first-child{color:#0b
     }
     // Weight
     const wRef = getRef(gender, 'weight', age);
+    if (!wRef) {
+      tbodyHtml += `<tr><td><strong style="color:#fff;">Weight</strong></td><td>${isNaN(weightVal) ? '—' : weightVal.toFixed(1) + ' kg'}</td><td colspan="3"><span class="tag tag-none">WHO 2007 has no weight-for-age after 10 years — use BMI-for-age</span></td></tr>`;
+    } else {
     const wLow = valFromZ(zNormLow, wRef.L, wRef.M, wRef.S);
     const wHigh = valFromZ(zNormHigh, wRef.L, wRef.M, wRef.S);
     if (!isNaN(weightVal)) {
-      const wZ = calcZ(weightVal, wRef.L, wRef.M, wRef.S);
+      const wZ = calcZr(weightVal, wRef);
       const wPct = normalCDF(wZ);
       let wTag = '<span class="tag tag-normal">Normal</span>';
       if (wPct < 3) wTag = '<span class="tag tag-danger">Underweight (< 3rd)</span>';
@@ -1451,6 +1495,7 @@ body[data-theme="light"] :is(.diet-tip,.insight-item) span:first-child{color:#0b
     } else {
       tbodyHtml += `<tr><td><strong style="color:#fff;">Weight</strong></td><td><span class="tag tag-none">Not Entered</span></td><td><span class="ref-val">${wLow.toFixed(1)} – ${wHigh.toFixed(1)} kg</span></td><td>${wRef.M.toFixed(1)} kg</td><td>—</td></tr>`;
     }
+    }
     // BMI
     const bmiRef = getRef(gender, 'bmi', age);
     const bmiLow = valFromZ(zNormLow, bmiRef.L, bmiRef.M, bmiRef.S);
@@ -1458,12 +1503,10 @@ body[data-theme="light"] :is(.diet-tip,.insight-item) span:first-child{color:#0b
     let calculatedBmi = NaN;
     if (!isNaN(heightVal) && !isNaN(weightVal)) {
       calculatedBmi = weightVal / Math.pow(heightVal / 100, 2);
-      const bmiZ = calcZ(calculatedBmi, bmiRef.L, bmiRef.M, bmiRef.S);
+      const bmiZ = calcZr(calculatedBmi, bmiRef);
       const bmiPct = normalCDF(bmiZ);
-      let bmiTag = '<span class="tag tag-normal">Healthy Weight</span>';
-      if (bmiPct < 3) bmiTag = '<span class="tag tag-danger">Underweight</span>';
-      else if (bmiPct >= 85 && bmiPct < 95) bmiTag = '<span class="tag tag-warning">Overweight</span>';
-      else if (bmiPct >= 95) bmiTag = '<span class="tag tag-danger">Obesity</span>';
+      const [bmiCls, bmiText] = bmiCategory(bmiZ, bmiRef, gender);
+      let bmiTag = `<span class="tag tag-${bmiCls}">${bmiText}</span>`;
       tbodyHtml += `<tr><td><strong style="color:#fff;">BMI</strong></td><td>${calculatedBmi.toFixed(2)} kg/m²</td><td><span class="ref-val">${bmiLow.toFixed(1)} – ${bmiHigh.toFixed(1)} kg/m²</span></td><td>${bmiRef.M.toFixed(1)} kg/m²</td><td><span class="tag tag-none" style="background:transparent; padding:0; border:none;">${bmiPct.toFixed(1)}th %ile</span><br><div style="margin-top:6px">${bmiTag}</div></td></tr>`;
     } else {
       tbodyHtml += `<tr><td><strong style="color:#fff;">BMI</strong></td><td><span class="tag tag-none">Requires H&W</span></td><td><span class="ref-val">${bmiLow.toFixed(1)} – ${bmiHigh.toFixed(1)} kg/m²</span></td><td>${bmiRef.M.toFixed(1)} kg/m²</td><td>—</td></tr>`;
@@ -1474,7 +1517,7 @@ body[data-theme="light"] :is(.diet-tip,.insight-item) span:first-child{color:#0b
       const hcLow = valFromZ(zNormLow, hcRef.L, hcRef.M, hcRef.S);
       const hcHigh = valFromZ(zNormHigh, hcRef.L, hcRef.M, hcRef.S);
       if (!isNaN(hcVal)) {
-        const hcZ = calcZ(hcVal, hcRef.L, hcRef.M, hcRef.S);
+        const hcZ = calcZr(hcVal, hcRef);
         const hcPct = normalCDF(hcZ);
         let hcTag = '<span class="tag tag-normal">Normal</span>';
         if (hcZ < -2.0) hcTag = '<span class="tag tag-danger">Microcephaly</span>';
@@ -1530,6 +1573,7 @@ body[data-theme="light"] :is(.diet-tip,.insight-item) span:first-child{color:#0b
   }
   function exportGrowthHistory(){const label=(document.getElementById('patientRecordId').value||'Unlabelled').trim();const rows=getGrowthHistory().filter(v=>v.label===label);if(!rows.length){alert('No saved visits for this patient label.');return;}const cols=['label','date','sex','years','months','age','height','weight','bmi','hc'];const csv=[cols.join(','),...rows.map(v=>cols.map(k=>{const x=v[k]??'';return '"'+String(x).replace(/"/g,'""')+'"'}).join(','))].join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='growth-history.csv';a.click();URL.revokeObjectURL(url);}
   function deleteGrowthHistory(){const label=(document.getElementById('patientRecordId').value||'Unlabelled').trim();if(!confirm(`Delete all saved visits for “${label}” from this browser? This cannot be undone.`))return;setGrowthHistory(getGrowthHistory().filter(v=>v.label!==label));renderGrowthHistory();}
+  document.addEventListener('DOMContentLoaded',()=>{const sel=document.getElementById('olderRef');if(sel)sel.value=olderRef;});
   document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('patientRecordId');if(el)el.addEventListener('change',renderGrowthHistory);});
 
 
@@ -1544,7 +1588,7 @@ body[data-theme="light"] :is(.diet-tip,.insight-item) span:first-child{color:#0b
     const metrics = [];
     const addMetric = (key,label,value,unit,color) => {
       if (!Number.isFinite(value) || value <= 0 || (key === 'hc' && age > 5)) return;
-      const ref = getRef(gender,key,age), z = calcZ(value,ref.L,ref.M,ref.S);
+      const ref = getRef(gender,key,age); if (!ref) return; const z = calcZr(value, ref);
       const percentile = Math.max(0,Math.min(100,normalCDF(z)));
       metrics.push({key,label,value,unit,median:ref.M,percentile,color,z});
     };
@@ -1556,7 +1600,7 @@ body[data-theme="light"] :is(.diet-tip,.insight-item) span:first-child{color:#0b
       {label:'Age at assessment',value:ageText,foot:'Years + months'},
       {label:'Measurements assessed',value:`${metrics.length} / ${age <= 5 ? 4 : 3}`,foot:'Based on entered values'},
       {label:'BMI',value:Number.isFinite(bmi) ? bmi.toFixed(1) : '—',foot:Number.isFinite(bmi) ? 'kg/m² · calculated' : 'Needs height + weight'},
-      {label:'Reference profile',value:'WHO / IAP',foot:'As configured in this tool'}
+      {label:'Reference profile',value:REF_LABEL[refSourceFor('height', age)],foot: age <= 5 ? 'WHO Child Growth Standards' : (olderRef === 'iap2015' ? 'Indian children, 5–18 y' : 'WHO Growth Reference, 5–19 y')}
     ];
     document.getElementById('dashboardKpis').innerHTML = kpis.map((k,i)=>`<div class="kpi-card" style="animation-delay:${i*70}ms"><span class="kpi-label">${k.label}</span><strong class="kpi-value">${k.value}</strong><span class="kpi-foot">${k.foot}</span></div>`).join('');
     document.getElementById('percentileRings').innerHTML = metrics.length ? metrics.map((m,i)=>`<div class="ring-item" style="animation:dashRise .45s ${i*60}ms both"><div class="ring" style="--pct:${m.percentile.toFixed(1)};--ring-color:${m.color}"><span class="ring-value">${Math.round(m.percentile)}th</span></div><div class="ring-label">${m.label}</div><div class="ring-sub">${m.value.toFixed(1)} ${m.unit}</div></div>`).join('') : '<div class="insight-item neutral"><span class="insight-symbol">i</span><span>Enter measurements and generate an assessment to populate the dashboard.</span></div>';
@@ -1827,11 +1871,13 @@ body[data-theme="light"] :is(.diet-tip,.insight-item) span:first-child{color:#0b
       ctx.shadowBlur = p.glow;
       ctx.shadowColor = p.color;
 
-      const step = 0.2;
       let first = true;
       const targetAge = maxAge * Math.max(0.05, Math.min(1, progress));
-      for (let a = 0.1; a <= targetAge + 0.001; a += step) {
+      for (let a = 0; a <= targetAge + 0.001; a += (a < 2 ? 0.02 : 0.1)) {
         const pRef = getRef(chartState.gender, currentChartType, a);
+        if (!pRef) { first = true; continue; }
+        // break the line at the length->height (2 y) and WHO->older-reference (5 y) seams
+        if (!first && (Math.abs(a - 2) < 0.011 || Math.abs(a - 5) < 0.051)) first = true;
         const val = valFromZ(p.z, pRef.L, pRef.M, pRef.S);
         const x = getX(a);
         const y = getY(val);
@@ -1841,7 +1887,9 @@ body[data-theme="light"] :is(.diet-tip,.insight-item) span:first-child{color:#0b
       ctx.restore();
 
       // Always draw percentile label on right
-      const endRef = getRef(chartState.gender, currentChartType, maxAge);
+      let endAge = maxAge, endRef = getRef(chartState.gender, currentChartType, endAge);
+      while (!endRef && endAge > 0) { endAge -= 0.1; endRef = getRef(chartState.gender, currentChartType, endAge); }
+      if (!endRef) return;
       const endVal = valFromZ(p.z, endRef.L, endRef.M, endRef.S);
       ctx.fillStyle = p.color;
       ctx.font = '700 10.5px "Plus Jakarta Sans", sans-serif';
@@ -1876,7 +1924,8 @@ body[data-theme="light"] :is(.diet-tip,.insight-item) span:first-child{color:#0b
 
       // Tooltip Box
       const pRef = getRef(chartState.gender, currentChartType, childAge);
-      const z = calcZ(childVal, pRef.L, pRef.M, pRef.S);
+      if (!pRef) return;
+      const z = calcZr(childVal, pRef);
       const pct = Math.max(0.1, Math.min(99.9, normalCDF(z)));
       const tipText = `${childVal.toFixed(1)} (${pct.toFixed(0)}th %ile)`;
 
@@ -1923,6 +1972,7 @@ body[data-theme="light"] :is(.diet-tip,.insight-item) span:first-child{color:#0b
       ctx.restore();
 
       const hRef = getRef(chartState.gender, currentChartType, chartHoverAge);
+      if (!hRef) return;
       const mVal = valFromZ(0.0, hRef.L, hRef.M, hRef.S);
       const lVal = valFromZ(-1.88, hRef.L, hRef.M, hRef.S);
       const uVal = valFromZ(1.88, hRef.L, hRef.M, hRef.S);
