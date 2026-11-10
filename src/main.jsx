@@ -299,33 +299,40 @@ function InteractiveCalendar({
           // Custom highlight tags
           let customClass = '';
           let badge = '';
+          let shortBadge = '';
 
           if (highlightConfig.isPeriod && highlightConfig.isPeriod(c.date)) {
             customClass += ' period';
             badge = 'Period';
+            shortBadge = 'Period';
           }
           if (highlightConfig.isOvulation && highlightConfig.isOvulation(c.date)) {
             customClass += ' ovulation';
             badge = '★ Peak';
+            shortBadge = '★ Peak';
           } else if (highlightConfig.isFertile && highlightConfig.isFertile(c.date)) {
             customClass += ' fertile';
             badge = 'Fertile';
+            shortBadge = 'Fertile';
           }
           if (highlightConfig.isNextPeriod && highlightConfig.isNextPeriod(c.date)) {
             customClass += ' next-period';
-            badge = badge || 'Next';
+            if (!badge) { badge = 'Next'; shortBadge = 'Next'; }
           }
           if (highlightConfig.isEdd && highlightConfig.isEdd(c.date)) {
             customClass += ' edd-day';
             badge = '♥ Due Date';
+            shortBadge = '♥ Due';
           }
           if (highlightConfig.isConception && highlightConfig.isConception(c.date)) {
             customClass += ' conception-day';
             badge = 'Conception';
+            shortBadge = 'Conc.';
           }
           if (highlightConfig.isTrimester && highlightConfig.isTrimester(c.date)) {
             customClass += ' trimester-day';
             badge = highlightConfig.getTrimesterLabel ? highlightConfig.getTrimesterLabel(c.date) : 'Trim';
+            shortBadge = badge;
           }
 
           return (
@@ -335,7 +342,12 @@ function InteractiveCalendar({
               onClick={() => onSelectDate && onSelectDate(c.date)}
             >
               <span>{c.day}</span>
-              {badge && <span className="cal-badge">{badge}</span>}
+              {badge && (
+                <span className="cal-badge" title={badge}>
+                  <span className="badge-full">{badge}</span>
+                  <span className="badge-short" aria-hidden="true">{shortBadge || badge}</span>
+                </span>
+              )}
             </div>
           );
         })}

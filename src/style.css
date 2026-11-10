@@ -475,6 +475,8 @@
 .calendar-grid{grid-template-columns:repeat(7,minmax(0,1fr))}
 .cal-day-cell{min-width:0;overflow:hidden;padding:2px}
 .cal-badge{max-width:100%;overflow:hidden;text-overflow:clip}
+.badge-short{display:none}
+@media(max-width:650px){.badge-short{display:inline}}
 .calendar-title{min-width:0;flex:1 1 220px}
 .calendar-title span{min-width:0}
 .calendar-nav{flex-wrap:wrap;min-width:0;max-width:100%}
@@ -500,9 +502,9 @@
   .calendar-grid{gap:3px}
   .cal-day-name{font-size:9.5px;letter-spacing:0;padding:6px 0}
   .cal-day-cell{aspect-ratio:auto;height:46px;min-height:0;border-radius:9px;font-size:12px;justify-content:center;gap:3px}
-  /* Text labels can't fit in a ~45px tile: show a dot; the legend and the
-     result cards below give the meaning and exact dates. */
-  .cal-badge{font-size:0;width:6px;height:6px;margin:0;border-radius:50%;background:currentColor;opacity:.95}
+  /* ~42px tiles: show a short label ("♥ Due", "Conc.") in a compact font */
+  .cal-badge{font-size:7.5px;letter-spacing:0;margin-top:0;text-align:center}
+  .badge-full{display:none}
   .calendar-legend{gap:8px 12px}
   .calc-results{grid-template-columns:minmax(0,1fr)}
 }
