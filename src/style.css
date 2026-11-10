@@ -528,3 +528,105 @@
 :root[data-theme="light"] .faq-item summary::after{background:var(--l-ctrl);color:var(--l-accent)}
 :root[data-theme="light"] .faq-item p{color:var(--muted)}
 @media(max-width:650px){.faq-item summary{font-size:13.5px;padding:13px 0}.faq-item p{font-size:12.5px}}
+/* Developmental assessment: age-optional view, upcoming preview, child name */
+.age-message{margin:20px 0 0;padding:13px 16px;border:1px solid rgba(183,156,255,.3);border-radius:14px;background:rgba(124,58,237,.12);color:#e4dcf7;font-size:14px;line-height:1.5}
+:root[data-theme="light"] .age-message{background:#f1eaff;border-color:#d9c8f6;color:#3b2a6b}
+.upcoming-panel{border-style:dashed!important;opacity:.92}
+.upcoming-panel .eyebrow{color:var(--muted)!important}
+@media print{
+  .upcoming-panel,.age-message,.preset-chips,.topbar,.bottom-nav,.primary,.secondary-action,.trust{display:none!important}
+}
+@media print{
+  .age-focus-banner{background:#fff!important;border:1px solid #bbb!important;color:#111!important}
+  .age-focus-banner *{color:#111!important}
+  .progress{display:none!important}
+}
+
+/* ================================================================
+   5-domain developmental scoring + DQ (src/devscore.jsx)
+   ================================================================ */
+.dev-score{--dv-line:rgba(208,157,255,.2);--dv-head:rgba(156,100,208,.16);--dv-row:rgba(255,255,255,.02);--dv-text:#eee5fa;--dv-sub:#c9bde3;--dv-btn:rgba(255,255,255,.05);--dv-btn-line:rgba(205,170,239,.3)}
+:root[data-theme="light"] .dev-score,:root[data-theme="light"] .dq-panel{--dv-line:#e6dcf6;--dv-head:#f4ecff;--dv-row:#fcfaff;--dv-text:#1d1433;--dv-sub:#4a4068;--dv-btn:#fff;--dv-btn-line:#d3c4ef}
+.dq-panel{--dv-line:rgba(208,157,255,.2);--dv-head:rgba(156,100,208,.16);--dv-row:rgba(255,255,255,.02);--dv-text:#eee5fa;--dv-sub:#c9bde3}
+.dev-progress{flex-shrink:0;text-align:right;display:flex;flex-direction:column;gap:2px}
+.dev-progress strong{font-size:22px;color:var(--dv-text)}
+.dev-progress span{font-size:12px;color:var(--dv-sub)}
+.dev-band{margin-top:18px;border:1px solid var(--dv-line);border-radius:14px;overflow:hidden}
+.dev-band-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;background:var(--dv-head);border-bottom:1px solid var(--dv-line)}
+.dev-band-head h3{margin:0;font-size:15px;color:var(--dv-text)}
+.dev-role{display:inline-block;margin-right:8px;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:rgba(124,58,237,.35);color:#f3ecff}
+.dev-band-current .dev-role{background:#7c3aed;color:#fff}
+:root[data-theme="light"] .dev-role{background:#e9defc;color:#4b2a8a}
+:root[data-theme="light"] .dev-band-current .dev-role{background:#6a2fd6;color:#fff}
+.dev-band-current{border-color:rgba(167,112,232,.6)}
+.dev-band-actions{display:flex;gap:6px;flex-wrap:wrap}
+.dev-band-actions button{padding:6px 10px;border-radius:9px;border:1px solid var(--dv-btn-line);background:var(--dv-btn);color:var(--dv-text);font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.dev-table{width:100%;border-collapse:collapse;font-size:14px;color:var(--dv-text)}
+.dev-table th,.dev-table td{padding:9px 12px;border-bottom:1px solid var(--dv-line);text-align:left;vertical-align:middle}
+.dev-table thead th{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--dv-sub);font-weight:800;background:var(--dv-row)}
+.dev-table tbody th{font-size:13px;font-weight:800;color:var(--dv-sub);width:150px;background:var(--dv-row)}
+.dev-table tbody tr:last-child td,.dev-table tbody tr:last-child th{border-bottom:0}
+.dev-table tr.unscored td:nth-child(2),.dev-table tr.unscored td:first-child{opacity:.92}
+.dev-score-col{width:270px}
+.dev-seg{display:inline-flex;border:1px solid var(--dv-btn-line);border-radius:10px;overflow:hidden}
+.dev-seg button{display:flex;align-items:center;gap:6px;padding:7px 10px;border:0;border-right:1px solid var(--dv-btn-line);background:var(--dv-btn);color:var(--dv-text);font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.dev-seg button:last-child{border-right:0}
+.dev-seg button b{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:5px;background:rgba(127,127,127,.18);font-size:11px}
+.dev-seg button.on.seg-0{background:#9f1239;color:#fff}
+.dev-seg button.on.seg-1{background:#a16207;color:#fff}
+.dev-seg button.on.seg-2{background:#047857;color:#fff}
+.dev-seg button.on b{background:rgba(255,255,255,.22)}
+.dev-seg button:focus-visible{outline:2px solid #a970e8;outline-offset:-2px}
+
+.dq-pending{margin:4px 0 0;padding:14px 16px;border:1px dashed var(--dv-line);border-radius:12px;color:var(--dv-sub)}
+.dq-composite{display:flex;gap:20px;align-items:center;padding:16px 18px;border-radius:14px;margin:6px 0 16px;border:1px solid}
+.dq-composite>div:first-child{display:flex;flex-direction:column;align-items:center;min-width:110px}
+.dq-composite>div:first-child span{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+.dq-composite strong{font-size:44px;line-height:1.05}
+.dq-composite b{font-size:17px}
+.dq-composite p{margin:4px 0;font-size:14px}
+.dq-composite small{font-size:12px;opacity:.9}
+.dq-table td:nth-child(n+2):not(:last-child){font-variant-numeric:tabular-nums}
+.dq-chip{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:800;border:1px solid}
+/* interpretation colours: dark theme */
+.dq-normal{background:rgba(16,185,129,.14);border-color:rgba(52,211,153,.45);color:#a7f3d0}
+.dq-borderline{background:rgba(234,179,8,.14);border-color:rgba(250,204,21,.45);color:#fde68a}
+.dq-mild{background:rgba(249,115,22,.15);border-color:rgba(251,146,60,.5);color:#fed7aa}
+.dq-moderate{background:rgba(239,68,68,.16);border-color:rgba(248,113,113,.5);color:#fecaca}
+.dq-severe{background:rgba(190,18,60,.25);border-color:rgba(251,113,133,.6);color:#ffe4e6}
+/* light theme */
+:root[data-theme="light"] .dq-normal{background:#e7f8f0;border-color:#9fdcc1;color:#065f46}
+:root[data-theme="light"] .dq-borderline{background:#fef6dc;border-color:#f0d27a;color:#713f12}
+:root[data-theme="light"] .dq-mild{background:#fff0e3;border-color:#f6be8c;color:#9a3412}
+:root[data-theme="light"] .dq-moderate{background:#fdeaea;border-color:#f3a9a9;color:#991b1b}
+:root[data-theme="light"] .dq-severe{background:#fde4ea;border-color:#f19ab0;color:#881337}
+.dq-flag{margin:14px 0 0;padding:12px 14px;border-radius:12px;background:rgba(239,68,68,.14);border:1px solid rgba(248,113,113,.45);color:#fecaca;font-size:14px;line-height:1.5}
+.dq-flag-soft{background:rgba(234,179,8,.12);border-color:rgba(250,204,21,.4);color:#fde68a}
+:root[data-theme="light"] .dq-flag{background:#fdeaea;border-color:#f3a9a9;color:#991b1b}
+:root[data-theme="light"] .dq-flag-soft{background:#fef6dc;border-color:#f0d27a;color:#713f12}
+.dq-method{margin-top:16px;font-size:13px;color:var(--dv-sub);line-height:1.55}
+.dq-method summary{cursor:pointer;font-weight:800;color:var(--dv-text)}
+.dq-method p{margin:8px 0 0}
+
+@media(max-width:650px){
+  .dev-band-head{flex-direction:column;align-items:flex-start}
+  .dev-table thead{display:none}
+  .dev-score .dev-table tbody tr{display:grid;grid-template-columns:1fr;padding:8px 10px;border-bottom:1px solid var(--dv-line)}
+  .dev-score .dev-table tbody th{display:block;width:auto;border:0;padding:6px 0 0;background:none}
+  .dev-score .dev-table tbody td{border:0;padding:4px 0}
+  .dev-score-col{width:auto}
+  .dev-seg{width:100%}.dev-seg button{flex:1;justify-content:center}
+  .dq-table{font-size:13px}.dq-table th,.dq-table td{padding:8px 6px}
+  .dq-table th:nth-child(3),.dq-table td:nth-child(3){display:none}
+  .dq-composite{flex-direction:column;align-items:flex-start}
+}
+@media print{
+  .dev-band-actions,.dq-method summary::marker{display:none!important}
+  .dq-method{display:block}
+  .dev-band,.dq-composite,.dq-table{break-inside:avoid}
+  .dev-seg button:not(.on){display:none!important}
+  .dev-seg button.on{background:#fff!important;color:#111!important;border:1px solid #555!important}
+  .dq-chip,.dq-composite,.dq-flag{background:#fff!important;border-color:#555!important}
+}
+.dq-note{margin:6px 0 0;font-size:13px;color:var(--dv-sub)}
+.dev-seg button{white-space:nowrap}.dev-score-col{width:300px}

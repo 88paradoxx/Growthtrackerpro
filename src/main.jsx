@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { developmentalMilestones } from './milestones.js';
 import { assessmentAges } from './assessment.js';
+import DevScoring from './devscore.jsx';
 import { getTheme, applyTheme, syncFrames, THEME_EVENT } from './theme.js';
 import { PAGES } from './seo.js';
 import './style.css';
@@ -470,6 +471,8 @@ function MilestonesPage({ onNavigate }) {
   const [m, setM] = useState('');
   const [evaluatedAge, setEvaluatedAge] = useState(null);
   const [checkedSkills, setCheckedSkills] = useState({});
+  // Ticks in "preview" checkpoints (all-groups view / upcoming) never count toward the score
+  const [previewChecks, setPreviewChecks] = useState({});
 
   const presetAges = [
     { label: '2 mo', years: '0', months: '2' },
@@ -495,15 +498,20 @@ function MilestonesPage({ onNavigate }) {
   );
 
   function handleEvaluate(overrideMonths = null) {
-    if (overrideMonths !== null) {
-      setEvaluatedAge(overrideMonths);
-      setCheckedSkills({});
-      return;
-    }
-    if (!hasEnteredAge) return;
-    setEvaluatedAge(totalMonths);
+    const next = overrideMonths !== null ? overrideMonths : (hasEnteredAge ? totalMonths : null);
+    if (next === evaluatedAge) return;
+    setEvaluatedAge(next);
     setCheckedSkills({});
+    setPreviewChecks({});
   }
+
+  // Age is optional and the page updates as you type (as in the original
+  // assessment tool): clearing both fields returns to the all-age-groups view.
+  useEffect(() => {
+    if (!hasEnteredAge) { handleEvaluate(null); return; }
+    if (isValidAge && totalMonths > 0) handleEvaluate(totalMonths);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [y, m]);
 
   function handleSelectPreset(preset) {
     setY(preset.years);
@@ -522,10 +530,45 @@ function MilestonesPage({ onNavigate }) {
   // Match the single clinical assessment domain group (1–5 years) for the evaluated age
   const matchedClinicalAssessment = useMemo(() => {
     if (evaluatedAge === null || evaluatedAge < 12 || evaluatedAge > 72) return null;
-    // Map age in months to 12, 24, 36, 48, or 60
+    // Map age in months to the latest band at or below it: 12, 24, 36, 48 or 60
     const matched = assessmentAges.filter(a => a.months <= evaluatedAge).at(-1);
     return matched || assessmentAges[0];
   }, [evaluatedAge]);
+
+  // Next checkpoint, shown as a preview only (excluded from the score and from print).
+  // Under 12 months the 12-month group is shown this way, because the checkpoints start at 1 year.
+  const upcomingClinicalAssessment = useMemo(() => {
+    if (evaluatedAge === null || evaluatedAge < 2) return null;
+    return assessmentAges.find(a => a.months > evaluatedAge) || null;
+  }, [evaluatedAge]);
+
+  const clinicalMessage = useMemo(() => {
+    if (evaluatedAge === null || evaluatedAge < 2 || evaluatedAge >= 12) return null;
+    return 'The 5-domain scoring and DQ begin at 12 months. The 12-month checkpoint is shown below as an upcoming reference, not a current assessment.';
+  }, [evaluatedAge]);
+
+  const renderDomainBand = (band, prefix, checks, setChecks) => (
+    <div className="assessment-domains">
+      {band.domains.map(domain => (
+        <article className="milestone-group" key={domain.name}>
+          <h4>{domain.name}</h4>
+          {domain.items.map((item, index) => {
+            const id = `${prefix}-${band.months}-${domain.name}-${index}`;
+            return (
+              <label className="check" key={id}>
+                <input
+                  type="checkbox"
+                  checked={!!checks[id]}
+                  onChange={e => setChecks(v => ({ ...v, [id]: e.target.checked }))}
+                />
+                <span>{item}</span>
+              </label>
+            );
+          })}
+        </article>
+      ))}
+    </div>
+  );
 
   // Red flags for this specific age
   const currentRedFlags = useMemo(() => {
@@ -538,14 +581,14 @@ function MilestonesPage({ onNavigate }) {
   // Calculate completion percentage strictly for the active parameters
   const activeSkillsCount = useMemo(() => {
     let count = 0;
-    if (matchedMilestone && evaluatedAge >= 2 && evaluatedAge <= 60) {
+    if (evaluatedAge === null) return 0;
+    if (evaluatedAge < 2 || evaluatedAge > 60) {
+      count += 5; // newborn or school-age checklist (5 items each)
+    } else if (matchedMilestone) {
       count += (matchedMilestone.groups || []).reduce((sum, g) => sum + g[2].length, 0);
     }
-    if (matchedClinicalAssessment) {
-      count += (matchedClinicalAssessment.domains || []).reduce((sum, d) => sum + d.items.length, 0);
-    }
-    return count;
-  }, [matchedMilestone, matchedClinicalAssessment, evaluatedAge]);
+    return count; // the 5-domain clinical items are scored separately (see DevScoring)
+  }, [matchedMilestone, evaluatedAge]);
 
   const completedCount = Object.values(checkedSkills).filter(Boolean).length;
   const progressPercent = activeSkillsCount > 0 ? Math.round((completedCount / activeSkillsCount) * 100) : 0;
@@ -614,6 +657,26 @@ function MilestonesPage({ onNavigate }) {
             </p>
           )}
         </section>
+
+        {/* Age is optional: with no age entered, every checkpoint is available to assess */}
+        {evaluatedAge === null && (
+          <>
+            <p className="age-message" role="status">
+              Age is optional. Enter an age or tap a chip to see only that age’s parameters — or use any age group below.
+            </p>
+            {assessmentAges.map(band => (
+              <section className="panel assessment-panel" key={band.months}>
+                <div className="assessment-heading">
+                  <div>
+                    <span className="eyebrow">CLINICAL DOMAIN CHECKLIST</span>
+                    <h2>{band.label} — 5 Domains</h2>
+                  </div>
+                </div>
+                {renderDomainBand(band, 'all', previewChecks, setPreviewChecks)}
+              </section>
+            ))}
+          </>
+        )}
 
         {/* Display strictly the parameters for the entered age */}
         {evaluatedAge !== null && isValidAge && (
@@ -733,36 +796,24 @@ function MilestonesPage({ onNavigate }) {
               </section>
             )}
 
-            {/* Clinical Developmental Checklist (Only for the matched age band) */}
+            {clinicalMessage && <p className="age-message" role="status">{clinicalMessage}</p>}
+
+            {/* 5-domain scoring + Developmental Quotient (12 months – 6 years) */}
             {matchedClinicalAssessment && (
-              <section className="panel assessment-panel">
+              <DevScoring key={evaluatedAge} ageMonths={evaluatedAge} />
+            )}
+
+            {/* Under 12 months: the 12-month checkpoint as an upcoming reference (not scored, not printed) */}
+            {!matchedClinicalAssessment && upcomingClinicalAssessment && (
+              <section className="panel assessment-panel upcoming-panel">
                 <div className="assessment-heading">
                   <div>
-                    <span className="eyebrow">CLINICAL DOMAIN CHECKLIST</span>
-                    <h2>{matchedClinicalAssessment.label} — 5 Domains</h2>
-                    <p>Parameters specifically verified by pediatricians for this age band:</p>
+                    <span className="eyebrow">UPCOMING MILESTONES · PREVIEW ONLY</span>
+                    <h2>{upcomingClinicalAssessment.label} — 5 Domains</h2>
+                    <p>Preview only — not scored.</p>
                   </div>
                 </div>
-                <div className="assessment-domains">
-                  {matchedClinicalAssessment.domains.map(domain => (
-                    <article className="milestone-group" key={domain.name}>
-                      <h4>{domain.name}</h4>
-                      {domain.items.map((item, index) => {
-                        const id = `clin-${matchedClinicalAssessment.months}-${domain.name}-${index}`;
-                        return (
-                          <label className="check" key={id}>
-                            <input
-                              type="checkbox"
-                              checked={!!checkedSkills[id]}
-                              onChange={e => setCheckedSkills(v => ({ ...v, [id]: e.target.checked }))}
-                            />
-                            <span>{item}</span>
-                          </label>
-                        );
-                      })}
-                    </article>
-                  ))}
-                </div>
+                {renderDomainBand(upcomingClinicalAssessment, 'next', previewChecks, setPreviewChecks)}
               </section>
             )}
 
