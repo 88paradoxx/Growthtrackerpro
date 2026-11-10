@@ -7,6 +7,7 @@ export const THEME_EVENT = 'growvita-theme-change';
 const THEME_COLORS = { dark: '#100a25', light: '#f7f4fc' };
 
 export function getTheme() {
+  if (typeof document === 'undefined') return 'dark';
   return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
 }
 

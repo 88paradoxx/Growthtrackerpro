@@ -9,6 +9,7 @@ import {
 import { developmentalMilestones } from './milestones.js';
 import { assessmentAges } from './assessment.js';
 import { getTheme, applyTheme, syncFrames, THEME_EVENT } from './theme.js';
+import { PAGES } from './seo.js';
 import './style.css';
 
 const tools = [
@@ -66,12 +67,12 @@ function isBetween(d, start, end) {
 
 function fmtDate(d) {
   if (!d) return '';
-  return new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(d);
+  return new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(d);
 }
 
 function fmtMonthYear(d) {
   if (!d) return '';
-  return new Intl.DateTimeFormat('en-IN', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(d);
+  return new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(d);
 }
 
 function getLocalToday() {
@@ -191,6 +192,31 @@ function Footer() {
       <div><Heart /><b>Doctor Verified</b><small>Built for parents & clinicians</small></div>
     </footer>
   );
+}
+
+// Collapsed FAQ list. <details> works without JavaScript, so the pre-rendered
+// HTML stays readable by search engines and AI crawlers.
+function Faq({ page }) {
+  const faqs = PAGES[page]?.faqs || [];
+  if (!faqs.length) return null;
+  return (
+    <section className="panel faq" aria-labelledby={`faq-${page}`}>
+      <h2 id={`faq-${page}`}>Frequently Asked Questions</h2>
+      {faqs.map(([q, a]) => (
+        <details key={q} className="faq-item">
+          <summary>{q}</summary>
+          <p>{a}</p>
+        </details>
+      ))}
+    </section>
+  );
+}
+
+// Reads ?lmp=YYYY-MM-DD (and ?cycle=N) so a shared or agent-built link opens
+// with the result already filled in.
+function readQuery(name) {
+  if (typeof window === 'undefined') return '';
+  try { return new URLSearchParams(window.location.search).get(name) || ''; } catch (_) { return ''; }
 }
 
 function PageIntro({ icon: Icon, kicker, title, desc, active, onNavigate }) {
@@ -408,6 +434,9 @@ function GrowthPage({ onNavigate }) {
             mid-parental target height, and serial visit logs.
           </p>
         </div>
+        {typeof window === 'undefined' ? (
+          <div style={{ height: `${iframeHeight}px` }} aria-hidden="true" />
+        ) : (
         <iframe
           ref={iframeRef}
           title="GrowVita Growth Chart & Centile Assessment"
@@ -424,6 +453,8 @@ function GrowthPage({ onNavigate }) {
           loading="eager"
           onLoad={() => syncFrames()}
         />
+        )}
+        <div className="page-wrap faq-wrap"><Faq page="growth" /></div>
       </main>
       <BottomNav active="growth" onNavigate={onNavigate} />
     </>
@@ -765,6 +796,7 @@ function MilestonesPage({ onNavigate }) {
           </section>
         )}
 
+        <Faq page="milestones" />
         <Footer />
       </main>
       <BottomNav active="milestones" onNavigate={onNavigate} />
@@ -781,6 +813,13 @@ function PeriodPage({ onNavigate }) {
   const [bleedDays, setBleedDays] = useState('5');
   const [calViewDate, setCalViewDate] = useState(() => getLocalToday());
   const [clickedDayInfo, setClickedDayInfo] = useState(null);
+
+  useEffect(() => {
+    const lmp = parseDate(readQuery('lmp'));
+    const c = Number(readQuery('cycle'));
+    if (lmp) { setLmpStr(toISODate(lmp)); setCalViewDate(lmp); }
+    if (c >= 21 && c <= 40) setCycleLength(String(Math.round(c)));
+  }, []);
 
   const parsedLmp = useMemo(() => parseDate(lmpStr), [lmpStr]);
   const cycle = Number(cycleLength);
@@ -946,7 +985,7 @@ function PeriodPage({ onNavigate }) {
                 value={cycleLength}
                 onChange={e => setCycleLength(e.target.value)}
               />
-              <small>Common normal range: 21 to 40 days (average 28 days).</small>
+              <small>Typical adult range: 21 to 35 days (average 28 days).</small>
             </label>
           </div>
         </section>
@@ -1019,6 +1058,8 @@ function PeriodPage({ onNavigate }) {
           </section>
         )}
 
+        <Faq page="period" />
+
         <p className="note">
           <b>Clinical note:</b> Menstrual dates and fertility windows are estimations based on regular cycle patterns. Ovulation timing can fluctuate due to stress, illness, sleep, or hormonal changes. This calendar is an educational tracking aid and should not be relied upon as a primary contraceptive method.
         </p>
@@ -1036,6 +1077,11 @@ function PeriodPage({ onNavigate }) {
 function EddPage({ onNavigate }) {
   const [lmpStr, setLmpStr] = useState('');
   const [calViewDate, setCalViewDate] = useState(() => getLocalToday());
+
+  useEffect(() => {
+    const lmp = parseDate(readQuery('lmp'));
+    if (lmp) { setLmpStr(toISODate(lmp)); setCalViewDate(lmp); }
+  }, []);
 
   const parsedLmp = useMemo(() => parseDate(lmpStr), [lmpStr]);
   const today = useMemo(() => getLocalToday(), []);
@@ -1258,6 +1304,8 @@ function EddPage({ onNavigate }) {
           </section>
         )}
 
+        <Faq page="edd" />
+
         <p className="note">
           <b>Clinical note:</b> Standard Naegele-style estimate (LMP + 280 days). Assumes a regular 28-day cycle and ovulation around cycle day 14. Due dates vary naturally, and only ~4% of babies arrive precisely on their estimated due date. Always verify dating and fetal development with your healthcare provider and ultrasound biometric measurements.
         </p>
@@ -1274,7 +1322,7 @@ function EddPage({ onNavigate }) {
 // ----------------------------------------
 const nutritionBands = [
   { max: .5, title: 'Milk-feeding guidance · Under 6 months', lead: 'For infants younger than 6 months, breast milk alone is generally recommended; if breastfeeding is not possible or insufficient, use an appropriate infant formula with clinician guidance. Do not start solids based only on a growth-chart result.', meals: [['Feeding', 'Breast milk', 'Feed responsively, including at night; seek lactation support if feeds are painful, ineffective, or wet nappies/weight gain are concerning.'], ['If needed', 'Infant formula', 'Use age-appropriate infant formula and prepare exactly as directed. Never dilute or concentrate it.'], ['Avoid', 'No solids yet', 'Do not give water, honey, juice, cereal in a bottle, or homemade animal-milk substitutes.']], tips: ['Review feeding technique, urine output and serial weight if growth is a concern.', 'Prematurity, poor feeding, dehydration, lethargy or persistent vomiting need prompt clinical review.'] },
-  { max: .75, title: 'First complementary foods · 6–8 months', lead: 'Continue breastfeeding. Start small amounts of soft, thick, nutrient-dense foods and gradually increase variety, texture and amount as the infant develops.', meals: [['Morning', 'Soft staple + iron source', 'Offer a thick, soft cereal or other familiar staple, paired with an iron-rich food suitable for the infant, such as mashed pulses, iron-fortified infant cereal, or well-cooked egg if safely introduced.'], ['Midday', 'Staple + protein + vegetables', 'Combine a familiar soft staple with mashed beans/lentils or another suitable protein and soft vegetables; add a small amount of suitable fat if needed.'], ['Later meal', 'Fruit or nutrient-rich food', 'Offer soft fruit and/or another age-appropriate nutrient-rich food, prepared to a safe texture.'], ['Feeding pattern', '2–3 meals/day', 'Offer small, frequent feeds; breastfeed responsively between meals. Adapt texture to developmental skills.']], tips: ['Offer iron-rich foods regularly: dal, beans, iron-fortified cereal, egg or meat/fish if used by the family.', 'Keep food soft and supervise closely; avoid choking hazards, added salt/sugar and honey before 12 months.'] },
+  { max: .75, title: 'First complementary foods · 6–8 months', lead: 'Continue breastfeeding. Start small amounts of soft, thick, nutrient-dense foods and gradually increase variety, texture and amount as the infant develops.', meals: [['Morning', 'Soft staple + iron source', 'Offer a thick, soft cereal or other familiar staple, paired with an iron-rich food suitable for the infant, such as mashed pulses, iron-fortified infant cereal, or well-cooked egg if safely introduced.'], ['Midday', 'Staple + protein + vegetables', 'Combine a familiar soft staple with mashed beans/lentils or another suitable protein and soft vegetables; add a small amount of suitable fat if needed.'], ['Later meal', 'Fruit or nutrient-rich food', 'Offer soft fruit and/or another age-appropriate nutrient-rich food, prepared to a safe texture.'], ['Feeding pattern', '2–3 meals/day', 'Offer small, frequent feeds; breastfeed responsively between meals. Adapt texture to developmental skills.']], tips: ['Offer iron-rich foods regularly: lentils, beans, iron-fortified cereal, egg or meat/fish if used by the family.', 'Keep food soft and supervise closely; avoid choking hazards, added salt/sugar and honey before 12 months.'] },
   { max: 1, title: 'Complementary foods · 9–11 months', lead: 'Continue breastfeeding and offer 3–4 meals daily, with texture advancing to mashed, chopped-soft and safe finger foods as skills allow.', meals: [['Breakfast', 'Staple + protein', 'A familiar soft grain or starchy staple with a suitable protein-rich food, prepared to a safe texture.'], ['Lunch', 'Mixed food groups', 'A staple food plus well-cooked pulses/beans, egg, fish, meat or another suitable protein, with soft vegetables.'], ['Snack', 'Fruit or suitable snack', 'Soft fruit or another nutrient-rich food prepared safely for the child’s skills.'], ['Dinner', 'Varied family foods', 'A different familiar staple, protein-rich food and vegetables; adapt texture and size to chewing skills.']], tips: ['Offer water in an open or training cup with meals; breast milk remains important.', 'Avoid whole nuts, popcorn, whole grapes, hard raw vegetables and other choking hazards.'] },
   { max: 2, title: 'Toddler food ideas · 12–23 months', lead: 'Continue breastfeeding to 2 years or beyond if desired. Offer 3–4 meals and 1–2 nutritious snacks, using varied family foods in safe bite sizes.', meals: [['Breakfast', 'Staple + protein', 'Choose a familiar grain or starchy staple (such as oats, bread, rice, maize or other local staple) with egg, beans, yoghurt or another suitable protein; add fruit if available.'], ['Lunch', 'Balanced meal', 'Combine a staple food with beans/lentils, egg, fish, meat, tofu or another protein, plus vegetables; include a suitable source of dietary fat.'], ['Snack', 'Fruit or nourishing snack', 'Offer whole fruit, plain yoghurt, cheese, cooked beans or another safe, age-appropriate snack; adapt for allergies and family food access.'], ['Dinner', 'Varied family meal', 'Serve a familiar staple with a protein-rich food and vegetables or fruit, using a texture and portion suitable for the child’s age.']], tips: ['Feed responsively: encourage, but do not force; keep meals calm and screen-free.', 'Offer iron-rich foods daily and varied fruits/vegetables; avoid sugary drinks and frequent packaged snacks.'] },
   { max: 19, title: 'Flexible balanced-meal ideas · 2 years and older', lead: 'Use these as flexible food-group ideas, not a fixed menu: combine locally available staple foods, protein-rich foods, vegetables and fruit, and dairy or a suitable alternative if used. Adapt to culture, budget, allergies and the child’s appetite.', meals: [['Breakfast', 'Staple + protein', 'A familiar grain or starchy food (for example oats, bread, maize or another local staple) with egg, beans, yoghurt or another suitable protein; offer fruit too.'], ['Lunch', 'Balanced meal', 'Combine a staple with beans/lentils, egg, fish, meat, tofu or another protein, plus vegetables and a suitable fat.'], ['Snack', 'Simple, nourishing', 'Offer fruit, plain yoghurt, cheese, cooked beans or another safe snack that suits the child’s age, allergies and family diet.'], ['Dinner', 'Variety', 'Choose a different staple, protein-rich food and vegetables; offer water as the usual drink.']], tips: ['Offer variety across the week using affordable foods available to the family; include protein-rich foods, vegetables and fruit where available.', 'Avoid using sugary drinks, appetite tonics or high-calorie supplements without a clinical indication.'] }
@@ -1385,6 +1433,7 @@ function NutritionPage({ onNavigate }) {
             </p>
           </section>
         )}
+        <Faq page="nutrition" />
         <Footer />
       </main>
       <BottomNav active="nutrition" onNavigate={onNavigate} />
@@ -1470,6 +1519,7 @@ function HomePage({ onNavigate }) {
           <Stethoscope />
         </section>
 
+        <Faq page="home" />
         <Footer />
       </main>
       <BottomNav active="home" onNavigate={onNavigate} />
@@ -1480,10 +1530,21 @@ function HomePage({ onNavigate }) {
 // ----------------------------------------
 // Main Application with Robust Routing
 // ----------------------------------------
-function App() {
+export function App({ initialRoute }) {
   const [currentRoute, setCurrentRoute] = useState(() => {
-    return normalizeRoute(window.location.pathname);
+    return initialRoute || normalizeRoute(window.location.pathname);
   });
+
+  // In-app navigation swaps pages without a reload, so keep the tab title,
+  // description and canonical link in step with the visible page.
+  useEffect(() => {
+    const p = PAGES[currentRoute];
+    if (!p) return;
+    document.title = p.title;
+    document.querySelector('meta[name="description"]')?.setAttribute('content', p.description);
+    const canon = document.querySelector('link[rel="canonical"]');
+    if (canon) canon.setAttribute('href', new URL(p.path, canon.href).href);
+  }, [currentRoute]);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -1523,4 +1584,6 @@ function App() {
   }
 }
 
-createRoot(document.getElementById('root')).render(<App />);
+if (typeof document !== 'undefined' && document.getElementById('root')) {
+  createRoot(document.getElementById('root')).render(<App />);
+}

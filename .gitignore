@@ -4,3 +4,4 @@ dist-offline/
 .DS_Store
 *.log
 .env
+.ssr/
