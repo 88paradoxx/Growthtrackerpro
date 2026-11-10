@@ -55,3 +55,17 @@ The WHO/IAP growth engine is intentionally retained as a standalone legacy page 
 - This is a standalone project and is not part of the GrowVita question-bank repository.
 - No production deployment or custom domain is configured by this source package.
 - Before launch, confirm product branding, canonical domain, contact email, and author details in the legacy growth page metadata.
+
+## Milestone data review (5-domain checkpoints, `src/assessment.js`)
+Checked against the CDC "Learn the Signs. Act Early." milestone lists (the pre-2022 "Important Milestones" pages the data was written from, and the 2022 revised checklists).
+
+| Age | Was | Now | Why |
+|---|---|---|---|
+| 12 m | Gross Motor: "Takes a few steps" | "Walks holding on to furniture (cruising)" | CDC says a 1-year-old only *may* take steps; cruising is the expected skill (2022 moved independent walking to 15 m) |
+| 12 m | Fine Motor: container only | + "Pincer grasp" | Placing in a container is a cognitive item in CDC; pincer grasp is the standard 12-month fine-motor milestone |
+| 24 m | "Uses 2-4 word phrases" | "Puts at least 2 words together" | 2022 CDC expects two-word combinations at 2 years; 2-4 word sentences over-call delay |
+| 24 m | "Draws straight lines/copies" | "Makes or copies straight lines" | Matches CDC wording |
+| 36 m | Fine Motor: "Puzzles with 3-4 pieces" | "Copies a circle"; puzzles moved to Cognitive | CDC lists puzzles under cognitive; copying a circle is the 3-year fine-motor standard |
+| 48 m | "Discerning real from fantasy" | "Prefers playing with other children to playing alone" | **Error:** CDC says 4-year-olds *often can't* tell real from make-believe — it is a 5-year skill |
+| 60 m | — | + "Can tell what's real and what's make-believe" | Correct age for that skill |
+| 60 m | Fine Motor: fork & spoon only | + "Copies a triangle" | Standard 5-year fine-motor milestone |

@@ -1,3 +1,6 @@
+// Five-domain clinical checkpoints (1-5 years).
+// Based on CDC "Learn the Signs. Act Early." milestone lists; checked against
+// the CDC checklists in Nov 2026 - see README "Milestone data review".
 export const assessmentAges = [
   {
     "years": 1,
@@ -8,12 +11,13 @@ export const assessmentAges = [
         "name": "Gross Motor",
         "items": [
           "Pulls to stand",
-          "Takes a few steps"
+          "Walks holding on to furniture (cruising)"
         ]
       },
       {
         "name": "Fine Motor",
         "items": [
+          "Picks up small objects between thumb and index finger (pincer grasp)",
           "Puts things in a container"
         ]
       },
@@ -54,13 +58,13 @@ export const assessmentAges = [
       {
         "name": "Fine Motor",
         "items": [
-          "Draws straight lines/copies"
+          "Makes or copies straight lines"
         ]
       },
       {
         "name": "Language & Comm.",
         "items": [
-          "Uses 2-4 word phrases",
+          "Puts at least 2 words together (e.g. \"more milk\")",
           "Follows simple commands"
         ]
       },
@@ -94,7 +98,7 @@ export const assessmentAges = [
       {
         "name": "Fine Motor",
         "items": [
-          "Puzzles with 3-4 pieces"
+          "Copies a circle with pencil or crayon"
         ]
       },
       {
@@ -107,7 +111,8 @@ export const assessmentAges = [
       {
         "name": "Cognitive",
         "items": [
-          "Plays pretend with dolls/toys"
+          "Plays pretend with dolls/toys",
+          "Does puzzles with 3-4 pieces"
         ]
       },
       {
@@ -155,7 +160,7 @@ export const assessmentAges = [
         "name": "Social-Emotional",
         "items": [
           "Cooperates with other kids",
-          "Discerning real from fantasy"
+          "Prefers playing with other children to playing alone"
         ]
       }
     ]
@@ -174,7 +179,8 @@ export const assessmentAges = [
       {
         "name": "Fine Motor",
         "items": [
-          "Uses everyday fork & spoon"
+          "Uses everyday fork & spoon",
+          "Copies a triangle"
         ]
       },
       {
@@ -195,7 +201,8 @@ export const assessmentAges = [
         "name": "Social-Emotional",
         "items": [
           "Wants to please friends",
-          "Exhibits distinct autonomy"
+          "Shows more independence",
+          "Can tell what's real and what's make-believe"
         ]
       }
     ]
