@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Child Development Assessment Tool</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        header {
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        h1 { color: var(--primary); font-size: 1.8rem; }
+        .btn-print {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .summary-banner {
+            background: #eef2ff;
+            border: 1px solid #e0e7ff;
+            border-radius: 8px;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 15px;
+        }
+        .score-box { font-size: 1.2rem; font-weight: bold; color: var(--primary); }
+        .progress-bar-container {
+            flex-grow: 1;
+            background: var(--border);
+            border-radius: 9999px;
+            height: 14px;
+            overflow: hidden;
+        }
+        .progress-bar { background: var(--primary); height: 100%; width: 0%; transition: width 0.3s ease; }
+        .percentage-display { font-weight: bold; color: var(--text-light); }
+        .age-section { margin-bottom: 30px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+        .age-header { background: #f1f5f9; padding: 12px 20px; font-weight: bold; font-size: 1.1rem; border-bottom: 1px solid var(--border); }
+        .milestone-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; padding: 20px; }
+        .domain-card { background: #fafafa; border: 1px solid var(--border); border-radius: 6px; padding: 15px; }
+        .domain-title { font-weight: 700; font-size: 0.85rem; color: var(--text-light); text-transform: uppercase; margin-bottom: 12px; border-bottom: 2px solid var(--border); padding-bottom: 4px; }
+        .checkbox-container { display: flex; flex-direction: column; gap: 10px; }
+        .checkbox-label { display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; cursor: pointer; }
+        .checkbox-label input { margin-top: 3px; }
+        .disclaimer { font-size: 0.8rem; color: var(--text-light); margin-top: 40px; border-top: 1px solid var(--border); padding-top: 20px; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <div>
+            <h1>Child Development Assessment Tool</h1>
+            <p style="color: var(--text-light);">Observe and monitor foundational milestones across core domains.</p>
+        </div>
+        <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+    </header>
+    <div class="summary-banner">
+        <div class="score-box">Milestones: <span id="score-display">0/0</span></div>
+        <div class="progress-bar-container"><div id="progress-bar" class="progress-bar"></div></div>
+        <div id="percentage-display" class="percentage-display">0%</div>
+    </div>
+
+    <!-- 1 Year -->
+    <div class="age-section">
+        <div class="age-header">1 Year (12 Months)</div>
+        <div class="milestone-grid">
+            <div class="domain-card"><div class="domain-title">Gross Motor</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Pulls to stand</label><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Takes a few steps</label></div></div>
+            <div class="domain-card"><div class="domain-title">Fine Motor</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Puts things in a container</label></div></div>
+            <div class="domain-card"><div class="domain-title">Language & Comm.</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Says "mama" or "dada"</label><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Waves bye-bye</label></div></div>
+            <div class="domain-card"><div class="domain-title">Cognitive</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Looks for hidden items</label></div></div>
+            <div class="domain-card"><div class="domain-title">Social-Emotional</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Shy/nervous with strangers</label><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Hands a book to read</label></div></div>
+        </div>
+    </div>
+
+    <!-- 2 Years -->
+    <div class="age-section">
+        <div class="age-header">2 Years (24 Months)</div>
+        <div class="milestone-grid">
+            <div class="domain-card"><div class="domain-title">Gross Motor</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Kicks a ball</label><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Walks up steps</label></div></div>
+            <div class="domain-card"><div class="domain-title">Fine Motor</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Draws straight lines/copies</label></div></div>
+            <div class="domain-card"><div class="domain-title">Language & Comm.</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Uses 2-4 word phrases</label><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Follows simple commands</label></div></div>
+            <div class="domain-card"><div class="domain-title">Cognitive</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Finds items under 2-3 layers</label></div></div>
+            <div class="domain-card"><div class="domain-title">Social-Emotional</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Gets excited with other kids</label><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Shows independence</label></div></div>
+        </div>
+    </div>
+
+    <!-- 3 Years -->
+    <div class="age-section">
+        <div class="age-header">3 Years (36 Months)</div>
+        <div class="milestone-grid">
+            <div class="domain-card"><div class="domain-title">Gross Motor</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Climbs well and safely</label><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Pedals a tricycle</label></div></div>
+            <div class="domain-card"><div class="domain-title">Fine Motor</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Puzzles with 3-4 pieces</label></div></div>
+            <div class="domain-card"><div class="domain-title">Language & Comm.</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Conversational sentences</label><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Understood by strangers</label></div></div>
+            <div class="domain-card"><div class="domain-title">Cognitive</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Plays pretend with dolls/toys</label></div></div>
+            <div class="domain-card"><div class="domain-title">Social-Emotional</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Shows affection for friends</label><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Takes turns in games</label></div></div>
+        </div>
+    </div>
+
+    <!-- 4 Years -->
+    <div class="age-section">
+        <div class="age-header">4 Years (48 Months)</div>
+        <div class="milestone-grid">
+            <div class="domain-card"><div class="domain-title">Gross Motor</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Hops on one leg</label><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Catches a bounced ball</label></div></div>
+            <div class="domain-card"><div class="domain-title">Fine Motor</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Cuts using safety scissors</label></div></div>
+            <div class="domain-card"><div class="domain-title">Language & Comm.</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Tells descriptive stories</label><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Uses who/what/where/why</label></div></div>
+            <div class="domain-card"><div class="domain-title">Cognitive</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Names colors and numbers</label><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Understands same/different</label></div></div>
+            <div class="domain-card"><div class="domain-title">Social-Emotional</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Cooperates with other kids</label><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Discerning real from fantasy</label></div></div>
+        </div>
+    </div>
+
+    <!-- 5 Years -->
+    <div class="age-section">
+        <div class="age-header">5 Years (60 Months)</div>
+        <div class="milestone-grid">
+            <div class="domain-card"><div class="domain-title">Gross Motor</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Balances on 1 foot 10s+</label></div></div>
+            <div class="domain-card"><div class="domain-title">Fine Motor</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Uses everyday fork & spoon</label></div></div>
+            <div class="domain-card"><div class="domain-title">Language & Comm.</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Speaks clearly and fluidly</label><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Narrative with full sentences</label></div></div>
+            <div class="domain-card"><div class="domain-title">Cognitive</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Counts to 10 or more items</label><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Knows basic shapes/letters</label></div></div>
+            <div class="domain-card"><div class="domain-title">Social-Emotional</div><div class="checkbox-container"><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Wants to please friends</label><label class="checkbox-label"><input type="checkbox" class="milestone-check"> Exhibits distinct autonomy</label></div></div>
+        </div>
+    </div>
+
+    <div class="disclaimer">
+        This is for informational purposes only. For medical advice or diagnosis, consult a professional. AI responses may include mistakes.
+    </div>
+</div>
+<script>
+    const checkboxes = document.querySelectorAll('.milestone-check');
+    const scoreDisplay = document.getElementById('score-display');
+    const progressBar = document.getElementById('progress-bar');
+    const percentageDisplay = document.getElementById('percentage-display');
+
+    function updateProgress() {
+        const total = checkboxes.length;
+        const checkedCount = document.querySelectorAll('.milestone-check:checked').length;
+        scoreDisplay.textContent = checkedCount + '/' + total;
+        const percentage = total > 0 ? Math.round((checkedCount / total) * 100) : 0;
+        progressBar.style.width = percentage + '%';
+        percentageDisplay.textContent = percentage + '%';
+    }
+    checkboxes.forEach(cb => cb.addEventListener('change', updateProgress));
+    updateProgress();
+</script>
+</body>
+</html>
