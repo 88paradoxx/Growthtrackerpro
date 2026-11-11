@@ -14,12 +14,21 @@ import { getTheme, applyTheme, syncFrames, THEME_EVENT } from './theme.js';
 import { PAGES } from './seo.js';
 import './style.css';
 
+// Page links: clean URLs on the website (growvita.app/growth), file names in the
+// open-from-a-folder build (npm run build:offline), where file:// needs them.
+const OFFLINE = import.meta.env.MODE === 'offline';
+function pageHref(file) {
+  if (OFFLINE) return file;
+  const name = file.replace(/\.html$/, '');
+  return name === 'index' ? '/' : `/${name}`;
+}
+
 const tools = [
-  { key: 'growth', title: 'Child Growth Chart', desc: 'Height, weight, BMI & head circumference centiles', href: 'growth.html', icon: ChartNoAxesColumnIncreasing, tone: 'cyan', sub: 'WHO / IAP Centiles' },
-  { key: 'milestones', title: 'Developmental Milestones', desc: 'Age-wise skills and developmental checklist', href: 'milestones.html', icon: Baby, tone: 'violet', sub: 'Age-wise Development' },
-  { key: 'period', title: 'Period & Cycle Calculator', desc: 'Cycle details, next period, ovulation & fertile calendar', href: 'period.html', icon: CalendarDays, tone: 'pink', sub: 'Cycle & Fertility Calendar' },
-  { key: 'edd', title: 'EDD Calculator', desc: 'Expected delivery date, pregnancy calendar & trimesters', href: 'edd.html', icon: Heart, tone: 'cyan', sub: 'Pregnancy Calendar' },
-  { key: 'nutrition', title: 'Nutrition Guide', desc: 'Age-based feeding and balanced-meal guidance', href: 'nutrition.html', icon: Apple, tone: 'pink', sub: 'Age-wise Nutrition' },
+  { key: 'growth', title: 'Child Growth Chart', desc: 'Height, weight, BMI & head circumference centiles', href: pageHref('growth.html'), icon: ChartNoAxesColumnIncreasing, tone: 'cyan', sub: 'WHO / IAP Centiles' },
+  { key: 'milestones', title: 'Developmental Milestones', desc: 'Age-wise skills and developmental checklist', href: pageHref('milestones.html'), icon: Baby, tone: 'violet', sub: 'Age-wise Development' },
+  { key: 'period', title: 'Period & Cycle Calculator', desc: 'Cycle details, next period, ovulation & fertile calendar', href: pageHref('period.html'), icon: CalendarDays, tone: 'pink', sub: 'Cycle & Fertility Calendar' },
+  { key: 'edd', title: 'EDD Calculator', desc: 'Expected delivery date, pregnancy calendar & trimesters', href: pageHref('edd.html'), icon: Heart, tone: 'cyan', sub: 'Pregnancy Calendar' },
+  { key: 'nutrition', title: 'Nutrition Guide', desc: 'Age-based feeding and balanced-meal guidance', href: pageHref('nutrition.html'), icon: Apple, tone: 'pink', sub: 'Age-wise Nutrition' },
 ];
 
 function normalizeRoute(p) {
@@ -110,17 +119,17 @@ function Header({ active, onNavigate }) {
   }, []);
 
   const navItems = [
-    ['Home', 'index.html', 'home'],
-    ['Growth', 'growth.html', 'growth'],
-    ['Milestones', 'milestones.html', 'milestones'],
-    ['Period & Cycle', 'period.html', 'period'],
-    ['EDD Calculator', 'edd.html', 'edd'],
-    ['Nutrition', 'nutrition.html', 'nutrition'],
+    ['Home', pageHref('index.html'), 'home'],
+    ['Growth', pageHref('growth.html'), 'growth'],
+    ['Milestones', pageHref('milestones.html'), 'milestones'],
+    ['Period & Cycle', pageHref('period.html'), 'period'],
+    ['EDD Calculator', pageHref('edd.html'), 'edd'],
+    ['Nutrition', pageHref('nutrition.html'), 'nutrition'],
   ];
 
   return (
     <header className="topbar">
-      <a className="brand" href="index.html" onClick={(e) => { e.preventDefault(); onNavigate('home', 'index.html'); }}>
+      <a className="brand" href={pageHref('index.html')} onClick={(e) => { e.preventDefault(); onNavigate('home', pageHref('index.html')); }}>
         <span className="brandmark"><img src="logo-mark.svg" alt="" width="32" height="32" /></span>
         <span><b>GrowVita</b><small>by Dr Mir Bilal, MBBS, MD Pediatrics</small></span>
       </a>
@@ -160,12 +169,12 @@ function Header({ active, onNavigate }) {
 
 function BottomNav({ active, onNavigate }) {
   const items = [
-    ['Home', 'index.html', Home, 'home'],
-    ['Growth', 'growth.html', ChartNoAxesColumnIncreasing, 'growth'],
-    ['Milestones', 'milestones.html', Baby, 'milestones'],
-    ['Period', 'period.html', CalendarDays, 'period'],
-    ['EDD', 'edd.html', Heart, 'edd'],
-    ['Nutrition', 'nutrition.html', Apple, 'nutrition'],
+    ['Home', pageHref('index.html'), Home, 'home'],
+    ['Growth', pageHref('growth.html'), ChartNoAxesColumnIncreasing, 'growth'],
+    ['Milestones', pageHref('milestones.html'), Baby, 'milestones'],
+    ['Period', pageHref('period.html'), CalendarDays, 'period'],
+    ['EDD', pageHref('edd.html'), Heart, 'edd'],
+    ['Nutrition', pageHref('nutrition.html'), Apple, 'nutrition'],
   ];
 
   return (
@@ -442,7 +451,7 @@ function GrowthPage({ onNavigate }) {
         <iframe
           ref={iframeRef}
           title="GrowVita Growth Chart & Centile Assessment"
-          src={`legacy-growth.html${window.location.search || ''}`}
+          src={`${OFFLINE ? 'legacy-growth.html' : '/legacy-growth'}${window.location.search || ''}`}
           scrolling="no"
           style={{
             width: '100%',

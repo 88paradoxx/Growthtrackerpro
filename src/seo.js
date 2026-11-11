@@ -57,7 +57,7 @@ export const PAGES = {
   },
 
   growth: {
-    path: '/growth.html',
+    path: '/growth',
     file: 'growth.html',
     name: 'Child Growth Chart',
     appName: 'Child Growth Chart & Percentile Calculator',
@@ -83,7 +83,7 @@ export const PAGES = {
   },
 
   milestones: {
-    path: '/milestones.html',
+    path: '/milestones',
     file: 'milestones.html',
     name: 'Developmental Milestones',
     appName: 'Developmental Milestones Checklist',
@@ -109,7 +109,7 @@ export const PAGES = {
   },
 
   period: {
-    path: '/period.html',
+    path: '/period',
     file: 'period.html',
     name: 'Period & Ovulation Calculator',
     appName: 'Period & Ovulation Calculator',
@@ -137,7 +137,7 @@ export const PAGES = {
   },
 
   edd: {
-    path: '/edd.html',
+    path: '/edd',
     file: 'edd.html',
     name: 'Due Date Calculator',
     appName: 'Due Date (EDD) Calculator',
@@ -165,7 +165,7 @@ export const PAGES = {
   },
 
   nutrition: {
-    path: '/nutrition.html',
+    path: '/nutrition',
     file: 'nutrition.html',
     name: 'Nutrition Guide',
     appName: 'Child Nutrition Guide',
