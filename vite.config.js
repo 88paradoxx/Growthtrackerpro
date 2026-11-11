@@ -24,6 +24,27 @@ const seoHead = () => ({
   }
 });
 
+// Google Tag Manager (website build only — not dev, not the offline copy).
+// Privacy: query parameters (e.g. ?lmp=… dates in pre-filled links) are moved
+// out of the address bar into window.__GV_QUERY *before* Tag Manager loads,
+// so they never reach Google. Advertising consent defaults to denied.
+export const GTM_ID = 'GTM-K3CHPK7B';
+const analytics = () => ({
+  name: 'growvita-analytics',
+  apply: 'build',
+  transformIndexHtml: {
+    order: 'post',
+    handler: (html) => html
+      .replace(/(<meta charset="[^"]*"\s*\/?>)/i, `$1
+<script>(function(){try{var q=location.search;if(q){window.__GV_QUERY=q;history.replaceState(history.state,'',location.pathname+location.hash);}}catch(e){}})();
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'granted'});</script>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM_ID}');</script>`)
+      .replace(/<body([^>]*)>/, `<body$1>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=${GTM_ID}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>`)
+  }
+});
+
 // `npm run build:offline` makes a copy you can open straight from a folder
 // (double-click index.html). Browsers block <script type="module"> on file://,
 // so in that mode the single bundle is loaded as a classic deferred script.
@@ -41,7 +62,7 @@ const offlineHtml = () => ({
 export default defineConfig(({ mode, isSsrBuild }) => ({
   // Relative asset paths: works at a domain root, in a sub-folder, or from file://
   base: './',
-  plugins: [react(), seoHead(), mode === 'offline' && offlineHtml()].filter(Boolean),
+  plugins: [react(), seoHead(), mode === 'offline' && offlineHtml(), mode !== 'offline' && !isSsrBuild && analytics()].filter(Boolean),
   build: {
     outDir: mode === 'offline' ? 'dist-offline' : 'dist',
     rollupOptions: isSsrBuild ? {} : {

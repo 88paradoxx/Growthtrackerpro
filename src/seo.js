@@ -50,7 +50,7 @@ export const PAGES = {
       ['Is GrowVita free?',
         'Yes. All tools are free to use with no sign-up.'],
       ['Is my data private?',
-        'Yes. Calculations run in your browser and the details you enter are not sent to a server.'],
+        'Yes. Calculations run in your browser and the details you enter are never sent to a server. GrowVita uses Google Analytics (through Google Tag Manager) only for anonymous page-visit statistics; dates and measurements are not included, and advertising cookies are off.'],
       ['Can GrowVita replace a doctor visit?',
         'No. The tools are for education and screening support. Always discuss growth, development, pregnancy or menstrual concerns with your doctor.'],
     ],

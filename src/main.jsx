@@ -227,7 +227,7 @@ function Faq({ page }) {
 // with the result already filled in.
 function readQuery(name) {
   if (typeof window === 'undefined') return '';
-  try { return new URLSearchParams(window.location.search).get(name) || ''; } catch (_) { return ''; }
+  try { return new URLSearchParams(window.__GV_QUERY ?? window.location.search).get(name) || ''; } catch (_) { return ''; }
 }
 
 function PageIntro({ icon: Icon, kicker, title, desc, active, onNavigate }) {
@@ -451,7 +451,7 @@ function GrowthPage({ onNavigate }) {
         <iframe
           ref={iframeRef}
           title="GrowVita Growth Chart & Centile Assessment"
-          src={`${OFFLINE ? 'legacy-growth.html' : '/legacy-growth'}${window.location.search || ''}`}
+          src={`${OFFLINE ? 'legacy-growth.html' : '/legacy-growth'}${window.__GV_QUERY ?? window.location.search ?? ''}`}
           scrolling="no"
           style={{
             width: '100%',
