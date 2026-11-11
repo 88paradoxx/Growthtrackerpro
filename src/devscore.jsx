@@ -25,6 +25,8 @@ export const SCORE_OPTIONS = [
 ];
 
 export const DQ_BANDS = [
+  { min: 130, key: 'advanced', label: 'Advanced', advice: 'Development well ahead of age. Routine surveillance; no intervention needed.' },
+  { min: 115, key: 'above', label: 'Above average', advice: 'Development ahead of age. Routine surveillance at next visit.' },
   { min: 85, key: 'normal', label: 'Within normal range', advice: 'Routine surveillance at next visit.' },
   { min: 70, key: 'borderline', label: 'Borderline', advice: 'Monitor; stimulate and re-screen in 3 months.' },
   { min: 50, key: 'mild', label: 'Mild delay', advice: 'Refer for formal developmental assessment.' },
@@ -67,7 +69,7 @@ export default function DevScoring({ ageMonths }) {
     const lowest = bands[0].band.months;
     const rows = domains.map((name) => {
       let da = lowest - STEP; // bands below the lowest scored one are credited as passed
-      let raw = 0, max = 0, curRaw = 0, curMax = 0;
+      let raw = 0, max = 0, curRaw = 0, curMax = 0, topFull = false;
       for (const { role, band } of bands) {
         const d = band.domains.find((x) => x.name === name);
         const s = d.items.reduce((sum, _, i) => sum + (scores[keyOf(band.months, name, i)] || 0), 0);
@@ -75,15 +77,20 @@ export default function DevScoring({ ageMonths }) {
         raw += s; max += m;
         if (role === 'Current') { curRaw = s; curMax = m; }
         da += STEP * (s / m);
+        topFull = s === m; // ends as: was the highest scored band fully achieved?
       }
       const dq = Math.round((da / caForDq) * 100);
-      return { name, raw, max, curRaw, curMax, da: Math.round(da * 10) / 10, dq, cls: classifyDQ(dq) };
+      // Every item at the highest scored checkpoint achieved: the true developmental
+      // age may be higher than this tool can measure, so DA and DQ are minimums.
+      const atCeiling = topFull;
+      return { name, raw, max, curRaw, curMax, da: Math.round(da * 10) / 10, dq, cls: classifyDQ(dq), atCeiling };
     });
     const composite = Math.round(rows.reduce((s, r) => s + r.dq, 0) / rows.length);
     const delayed = rows.filter((r) => r.dq < 70);
     const totalRaw = rows.reduce((s, r) => s + r.raw, 0);
     const totalMax = rows.reduce((s, r) => s + r.max, 0);
-    return { rows, composite, compositeCls: classifyDQ(composite), delayed, totalRaw, totalMax };
+    const ceilingRows = rows.filter((r) => r.atCeiling);
+    return { rows, composite, compositeCls: classifyDQ(composite), delayed, totalRaw, totalMax, ceilingRows };
   }, [bands, scores, caForDq]);
 
   if (!bands.length) return null;
@@ -180,7 +187,7 @@ export default function DevScoring({ ageMonths }) {
             <div className={`dq-composite dq-${result.compositeCls.key}`}>
               <div>
                 <span>Composite DQ</span>
-                <strong>{result.composite}</strong>
+                <strong>{result.ceilingRows.length ? '≥ ' : ''}{result.composite}</strong>
               </div>
               <div>
                 <b>{result.compositeCls.label}</b>
@@ -204,15 +211,22 @@ export default function DevScoring({ ageMonths }) {
                 {result.rows.map((r) => (
                   <tr key={r.name}>
                     <th scope="row">{r.name}</th>
-                    <td>{r.curRaw}/{r.curMax}</td>
-                    <td>{r.raw}/{r.max}</td>
-                    <td>{r.da}</td>
-                    <td><strong>{r.dq}</strong></td>
-                    <td><span className={`dq-chip dq-${r.cls.key}`}>{r.cls.label}</span></td>
+                    <td data-label="Current checkpoint">{r.curRaw}/{r.curMax}</td>
+                    <td data-label="Raw (all bands)">{r.raw}/{r.max}</td>
+                    <td data-label="Dev. age (mo)">{r.atCeiling ? '≥ ' : ''}{r.da}</td>
+                    <td data-label="DQ"><strong>{r.atCeiling ? '≥ ' : ''}{r.dq}</strong></td>
+                    <td data-label="Interpretation"><span className={`dq-chip dq-${r.cls.key}`}>{r.cls.label}</span></td>
                   </tr>
                 ))}
               </tbody>
             </table>
+
+            {result.ceilingRows.length > 0 && (
+              <p className="dq-note dq-ceiling">
+                <b>Ceiling reached{result.ceilingRows.length < result.rows.length ? ` in ${result.ceilingRows.map((r) => r.name).join(', ')}` : ''}:</b>{' '}
+                every item at the highest checkpoint scored was achieved, so the true developmental age may be higher than shown — values marked ≥ are minimums.
+              </p>
+            )}
 
             {result.delayed.length >= 2 && ageMonths < 60 && (
               <p className="dq-flag">
@@ -231,7 +245,7 @@ export default function DevScoring({ ageMonths }) {
         <details className="dq-method">
           <summary>Method &amp; interpretation</summary>
           <p><b>DQ = Developmental age ÷ Chronological age × 100.</b> Developmental age per domain = age credited below the basal checkpoint + 12 months × (domain score ÷ maximum) for each scored checkpoint. Emerging skills count half, so scoring the ceiling checkpoint matters for children between checkpoints.</p>
-          <p>Bands: ≥ 85 normal · 70–84 borderline · 50–69 mild · 35–49 moderate · &lt; 35 severe delay. Global developmental delay: DQ &lt; 70 in two or more domains in a child under 5.</p>
+          <p>Bands: ≥ 130 advanced · 115–129 above average · 85–114 normal · 70–84 borderline · 50–69 mild · 35–49 moderate · &lt; 35 severe delay. Global developmental delay: DQ &lt; 70 in two or more domains in a child under 5.</p>
           <p>Screening estimate on 12-month checkpoints — not a standardised, normed test. Confirm abnormal results with a validated instrument (e.g. DASII, Bayley-4, ASQ-3) and clinical evaluation.</p>
         </details>
       </section>
