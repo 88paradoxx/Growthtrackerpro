@@ -1,13 +1,26 @@
 {
-  "name": "GrowVita",
+  "id": "/",
+  "name": "GrowVita – Child Growth, Pregnancy & Period Calculators",
   "short_name": "GrowVita",
-  "description": "Child growth, milestones, due date, period and nutrition calculators.",
-  "start_url": "./index.html",
+  "description": "Child growth charts (WHO & IAP), developmental milestones with DQ, due date, period and nutrition calculators by Dr Mir Bilal, MD Pediatrics.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#100a25",
   "theme_color": "#100a25",
+  "categories": ["health", "medical", "lifestyle"],
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Growth chart", "short_name": "Growth", "url": "/growth.html" },
+    { "name": "Milestones & DQ", "short_name": "Milestones", "url": "/milestones.html" },
+    { "name": "Period & ovulation", "short_name": "Period", "url": "/period.html" },
+    { "name": "Due date (EDD)", "short_name": "EDD", "url": "/edd.html" }
   ]
 }

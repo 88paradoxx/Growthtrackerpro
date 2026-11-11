@@ -6,6 +6,20 @@
 export const SITE_URL = 'https://growvita.app';
 export const SITE_NAME = 'GrowVita';
 export const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
+// Optional: your X (Twitter) handle, e.g. '@growvita'. Leave empty if none.
+export const TWITTER_HANDLE = '';
+
+// Per-page social cards (1200x630, in /public)
+const SOCIAL = {
+  home: ['og-image.jpg', 'GrowVita – child growth, pregnancy and period calculators by Dr Mir Bilal'],
+  growth: ['og-growth.jpg', 'GrowVita child growth chart and percentile calculator (WHO 2006, IAP 2015)'],
+  milestones: ['og-milestones.jpg', 'GrowVita developmental milestones checklist with DQ score'],
+  period: ['og-period.jpg', 'GrowVita period and ovulation calculator with fertile window'],
+  edd: ['og-edd.jpg', 'GrowVita due date and pregnancy week calculator'],
+  nutrition: ['og-nutrition.jpg', 'GrowVita baby and child food chart by age'],
+};
+export const socialImage = (key) => `${SITE_URL}/${(SOCIAL[key] || SOCIAL.home)[0]}`;
+const socialAlt = (key) => (SOCIAL[key] || SOCIAL.home)[1];
 
 export const AUTHOR = {
   '@type': 'Person',
@@ -255,16 +269,27 @@ export function buildHeadTags(key) {
     `<meta property="og:title" content="${esc(p.title)}"/>`,
     `<meta property="og:description" content="${esc(p.description)}"/>`,
     `<meta property="og:url" content="${url}"/>`,
-    `<meta property="og:image" content="${OG_IMAGE}"/>`,
+    `<meta property="og:image" content="${socialImage(key)}"/>`,
+    `<meta property="og:image:secure_url" content="${socialImage(key)}"/>`,
+    `<meta property="og:image:type" content="image/jpeg"/>`,
     `<meta property="og:image:width" content="1200"/>`,
     `<meta property="og:image:height" content="630"/>`,
-    `<meta property="og:image:alt" content="GrowVita – child growth, pregnancy and period calculators"/>`,
+    `<meta property="og:image:alt" content="${esc(socialAlt(key))}"/>`,
     `<meta name="twitter:card" content="summary_large_image"/>`,
+    ...(TWITTER_HANDLE ? [`<meta name="twitter:site" content="${esc(TWITTER_HANDLE)}"/>`] : []),
     `<meta name="twitter:title" content="${esc(p.title)}"/>`,
     `<meta name="twitter:description" content="${esc(p.description)}"/>`,
-    `<meta name="twitter:image" content="${OG_IMAGE}"/>`,
+    `<meta name="twitter:image" content="${socialImage(key)}"/>`,
+    `<meta name="twitter:image:alt" content="${esc(socialAlt(key))}"/>`,
+    `<meta name="application-name" content="${SITE_NAME}"/>`,
+    `<meta name="apple-mobile-web-app-title" content="${SITE_NAME}"/>`,
+    `<meta name="apple-mobile-web-app-capable" content="yes"/>`,
+    `<meta name="mobile-web-app-capable" content="yes"/>`,
+    `<meta name="apple-mobile-web-app-status-bar-style" content="black"/>`,
+    `<meta name="format-detection" content="telephone=no"/>`,
+    `<link rel="icon" href="favicon.ico" sizes="48x48"/>`,
     `<link rel="icon" href="favicon.svg" type="image/svg+xml"/>`,
-    `<link rel="apple-touch-icon" href="apple-touch-icon.png"/>`,
+    `<link rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180"/>`,
     `<link rel="manifest" href="site.webmanifest"/>`,
     `<script type="application/ld+json">${json}</script>`,
   ].join('');
