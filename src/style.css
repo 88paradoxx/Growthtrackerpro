@@ -671,3 +671,5 @@
   .dq-table th:nth-child(3),.dq-table td:nth-child(3){display:flex!important}
 }
 @media(max-width:650px){.dq-table tbody td .dq-chip{align-self:flex-start}}
+.brandmark img{width:32px;height:32px;display:block}
+:root[data-theme="light"] .brandmark{background:linear-gradient(180deg,#2b1655,#5a2463);border-color:#cdb4f2}

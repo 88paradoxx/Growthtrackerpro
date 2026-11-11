@@ -32,7 +32,7 @@ export const AUTHOR = {
 };
 
 // Bump when the medical content is reviewed again.
-export const LAST_REVIEWED = '2026-11-10';
+export const LAST_REVIEWED = '2026-11-11';
 
 export const PAGES = {
   home: {
@@ -61,6 +61,8 @@ export const PAGES = {
     file: 'growth.html',
     name: 'Child Growth Chart',
     appName: 'Child Growth Chart & Percentile Calculator',
+    features: ["WHO Child Growth Standards 2006 (0–5 years)", "IAP 2015 Indian charts (5–18 years) or WHO 2007 reference", "Height/length, weight, BMI and head circumference centiles and z-scores", "BMI categories per reference (WHO, IAP adult-equivalent 23/27)", "Mid-parental target height", "Interactive growth chart and visit log"],
+    prefill: {"template": "sex={sex}&years={years}&months={months}&height={height}&weight={weight}&hc={hc}&father={father}&mother={mother}&ref={ref}", "params": {"sex": "male|female", "years": "0-18", "months": "0-11", "height": "cm", "weight": "kg", "hc": "cm", "father": "cm", "mother": "cm", "ref": "iap2015|who2007"}, "example": "sex=male&years=2&months=6&height=88&weight=12.5&hc=48", "note": "age_months may replace years+months; hc only up to 5 years; ref selects the 5–18 year reference (default iap2015)"},
     title: 'Child Growth Chart & Percentile Calculator | GrowVita',
     description:
       'Check height, weight, BMI and head circumference percentiles on WHO and IAP growth charts, plus mid-parental target height. Ages 0–18 years.',
@@ -72,7 +74,7 @@ export const PAGES = {
       ['Which growth chart should I use, WHO or another?',
         'The WHO growth standards are used internationally for children under 5. For older children, many countries use a national reference: in the US, the CDC recommends WHO charts up to age 2 and CDC charts from 2 to 19. GrowVita offers WHO charts and the IAP 2015 charts for ages 5 to 18.'],
       ['How is a child’s BMI interpreted?',
-        'Child BMI is read against age- and sex-specific percentiles, not adult cut-offs. A BMI at or above the 85th percentile is generally considered overweight, and at or above the 95th percentile obesity.'],
+        'Child BMI is read against age- and sex-specific charts, not adult cut-offs. Under 5 (WHO): above +2 SD is overweight and above +3 SD obesity. From 5 to 18, the IAP 2015 charts use the lines equivalent to an adult BMI of 23 (overweight) and 27 (obesity); WHO 2007 uses +1 SD and +2 SD. US CDC charts use the 85th and 95th percentiles.'],
       ['What is mid-parental (target) height?',
         'It estimates a child’s adult height from the parents’ heights. For boys: (father’s height + mother’s height + 13 cm) ÷ 2. For girls: (father’s height + mother’s height − 13 cm) ÷ 2. Most children end within about 8.5 cm of this value.'],
       ['How do I measure my child’s height correctly?',
@@ -85,9 +87,11 @@ export const PAGES = {
     file: 'milestones.html',
     name: 'Developmental Milestones',
     appName: 'Developmental Milestones Checklist',
+    features: ["CDC milestone checklist by age (2 months – 5 years)", "Five-domain scoring: gross motor, fine motor, language, cognitive, social-emotional", "Items scored 0/1/2 across basal, current and ceiling checkpoints", "Developmental quotient (DQ) per domain and composite, with interpretation bands", "Global developmental delay flag (DQ < 70 in ≥ 2 domains)", "Red flags by age"],
+    prefill: {"template": "years={years}&months={months}", "params": {"years": "0-18", "months": "0-11"}, "example": "years=2&months=0", "note": "age_months may replace years+months; DQ scoring is available from 12 months to 6 years"},
     title: 'Developmental Milestones by Month (0–5 Yrs) | GrowVita',
     description:
-      'Developmental milestones checklist from 2 months to 5 years: motor, language, social and thinking skills, plus red flags to discuss with your doctor.',
+      'Developmental milestones from 2 months to 5 years, with a 5-domain score and developmental quotient (DQ), plus red flags to discuss with your doctor.',
     faqs: [
       ['When do babies smile, sit, crawl and walk?',
         'Most babies give a social smile by 6–8 weeks, hold their head steady by 3–4 months, roll over by 4–6 months, sit without support by 6–8 months, crawl around 9 months and walk alone between 12 and 15 months.'],
@@ -109,6 +113,8 @@ export const PAGES = {
     file: 'period.html',
     name: 'Period & Ovulation Calculator',
     appName: 'Period & Ovulation Calculator',
+    features: ["Next period prediction", "Ovulation day and 6-day fertile window", "Interactive cycle calendar", "Calendar reminders (.ics) the day before and on the day"],
+    prefill: {"template": "lmp={lmp}&cycle={cycle}", "params": {"lmp": "YYYY-MM-DD", "cycle": "21-40"}, "example": "lmp=2026-11-01&cycle=28", "note": "lmp = first day of last period"},
     title: 'Period & Ovulation Calculator – Fertile Days | GrowVita',
     description:
       'Predict your next period, ovulation day and fertile window from your last period and cycle length, shown on an interactive monthly calendar.',
@@ -135,6 +141,8 @@ export const PAGES = {
     file: 'edd.html',
     name: 'Due Date Calculator',
     appName: 'Due Date (EDD) Calculator',
+    features: ["Due date by Naegele's rule (LMP + 280 days)", "Gestational age in weeks and days", "Trimester progress", "Pregnancy calendar", "Calendar reminders for weeks 36–39 and the due date"],
+    prefill: {"template": "lmp={lmp}", "params": {"lmp": "YYYY-MM-DD"}, "example": "lmp=2026-03-17", "note": "lmp = first day of last menstrual period"},
     title: 'Due Date Calculator – EDD & Pregnancy Weeks | GrowVita',
     description:
       'Calculate your due date (EDD) from your last period. See how many weeks pregnant you are, your trimester and key dates on a pregnancy calendar.',
@@ -161,6 +169,7 @@ export const PAGES = {
     file: 'nutrition.html',
     name: 'Nutrition Guide',
     appName: 'Child Nutrition Guide',
+    features: ["Age-wise food chart (0–18 years)", "When and how to start solids", "Meals per day by age", "Balanced meal ideas and feeding tips"],
     title: 'Baby & Child Food Chart by Age – Diet Guide | GrowVita',
     description:
       'Baby and child food chart by age: when to start solids, what to feed at 6 months and 1 year, how many meals a day, and balanced meal ideas.',
@@ -213,7 +222,8 @@ export function buildJsonLd(key) {
       author: { '@id': `${SITE_URL}/#author` },
       reviewedBy: { '@id': `${SITE_URL}/#author` },
       lastReviewed: LAST_REVIEWED,
-      image: OG_IMAGE,
+      image: socialImage(key),
+      audience: [{ '@type': 'PeopleAudience', audienceType: 'Parents' }, { '@type': 'MedicalAudience', audienceType: 'Clinician' }],
     },
   ];
   if (p.appName) {
@@ -227,6 +237,9 @@ export function buildJsonLd(key) {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       author: { '@id': `${SITE_URL}/#author` },
+      screenshot: socialImage(key),
+      ...(p.features ? { featureList: p.features } : {}),
+      ...(p.prefill ? { potentialAction: { '@type': 'UseAction', target: { '@type': 'EntryPoint', urlTemplate: `${url}?${p.prefill.template}`, actionPlatform: ['https://schema.org/DesktopWebPlatform', 'https://schema.org/MobileWebPlatform'] } } } : {}),
     });
     graph.push({
       '@type': 'BreadcrumbList',

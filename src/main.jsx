@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
-  Activity, Baby, Apple, CalendarDays, Heart, Home, Moon, Sun, Menu, X, ArrowRight,
+  Baby, Apple, CalendarDays, Heart, Home, Moon, Sun, Menu, X, ArrowRight,
   ChartNoAxesColumnIncreasing, ClipboardCheck, Sparkles, ShieldCheck, Zap,
   MonitorSmartphone, Stethoscope, Info, ChevronRight, ChevronLeft, Calendar,
   AlertTriangle, CheckCircle2, RotateCcw, Printer, Star
@@ -121,7 +121,7 @@ function Header({ active, onNavigate }) {
   return (
     <header className="topbar">
       <a className="brand" href="index.html" onClick={(e) => { e.preventDefault(); onNavigate('home', 'index.html'); }}>
-        <span className="brandmark"><Activity /></span>
+        <span className="brandmark"><img src="logo-mark.svg" alt="" width="32" height="32" /></span>
         <span><b>GrowVita</b><small>by Dr Mir Bilal, MBBS, MD Pediatrics</small></span>
       </a>
       <nav className={open ? 'nav open' : 'nav'}>
@@ -442,7 +442,7 @@ function GrowthPage({ onNavigate }) {
         <iframe
           ref={iframeRef}
           title="GrowVita Growth Chart & Centile Assessment"
-          src="legacy-growth.html"
+          src={`legacy-growth.html${window.location.search || ''}`}
           scrolling="no"
           style={{
             width: '100%',
@@ -468,8 +468,16 @@ function GrowthPage({ onNavigate }) {
 // (ONLY the required parameters for the entered age are visible)
 // ----------------------------------------
 function MilestonesPage({ onNavigate }) {
-  const [y, setY] = useState('');
-  const [m, setM] = useState('');
+  // Pre-filled link: ?years=2&months=6 or ?age_months=30
+  const initialAge = (() => {
+    const am = parseInt(readQuery('age_months'), 10);
+    if (Number.isFinite(am) && am >= 0 && am <= 216) return [String(Math.floor(am / 12)), String(am % 12)];
+    const yy = parseInt(readQuery('years'), 10), mm = parseInt(readQuery('months'), 10);
+    if (Number.isFinite(yy) || Number.isFinite(mm)) return [Number.isFinite(yy) ? String(yy) : '0', Number.isFinite(mm) ? String(mm) : '0'];
+    return ['', ''];
+  })();
+  const [y, setY] = useState(initialAge[0]);
+  const [m, setM] = useState(initialAge[1]);
   const [evaluatedAge, setEvaluatedAge] = useState(null);
   const [checkedSkills, setCheckedSkills] = useState({});
   // Ticks in "preview" checkpoints (all-groups view / upcoming) never count toward the score

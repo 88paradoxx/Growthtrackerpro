@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="6 6 52 52" aria-hidden="true">
+  <defs><linearGradient id="gvFig" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb3dc"/><stop offset="1" stop-color="#d68cff"/></linearGradient>
+  <linearGradient id="gvGround" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f28bdc" stop-opacity="0"/><stop offset=".5" stop-color="#f28bdc"/><stop offset="1" stop-color="#f28bdc" stop-opacity="0"/></linearGradient></defs>
+  
+  <!-- ground -->
+  <path d="M8 55.5 Q32 52.5 56 55.5" fill="none" stroke="url(#gvGround)" stroke-width="1.6" stroke-linecap="round" opacity=".75"/>
+  <g fill="url(#gvFig)">
+    <!-- mother: head, hair bun, dress, legs mid-stride -->
+    <circle cx="23.5" cy="13.2" r="5.2"/>
+    <circle cx="19.2" cy="11.6" r="2.6"/>
+    <path d="M18.6 20.4 Q23.5 18.4 28.4 20.4 L30.2 31 Q32.8 40.5 33.6 44.6 Q23.6 46.6 13.6 44.6 Q15.6 36 17 31 Z"/>
+    <path d="M19.4 44 L16.6 54.6" stroke="url(#gvFig)" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+    <path d="M27.4 44 L30.6 54.6" stroke="url(#gvFig)" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+    <!-- child: head, tunic, legs mid-stride -->
+    <circle cx="43.4" cy="30.6" r="4.1"/>
+    <path d="M39.4 36.4 Q43.4 34.9 47.4 36.4 L48.2 46.2 Q43.4 47.4 38.6 46.2 Z"/>
+    <path d="M41 46 L39.2 54.8" stroke="url(#gvFig)" stroke-width="2.9" stroke-linecap="round" fill="none"/>
+    <path d="M45.8 46 L48.2 54.6" stroke="url(#gvFig)" stroke-width="2.9" stroke-linecap="round" fill="none"/>
+  </g>
+  <!-- joined arms: mother's shoulder -> clasped hands -> child's shoulder -->
+  <path d="M28.6 22.6 Q32.6 30 35.4 36.4 Q37.6 36.8 39.8 37.4" fill="none" stroke="url(#gvFig)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="35.6" cy="36.6" r="1.9" fill="#ffe3f2"/>
+</svg>

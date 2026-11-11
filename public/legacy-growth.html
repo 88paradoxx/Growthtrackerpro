@@ -1574,6 +1574,26 @@ body[data-theme="light"] :is(.diet-tip,.insight-item) span:first-child{color:#0b
   function exportGrowthHistory(){const label=(document.getElementById('patientRecordId').value||'Unlabelled').trim();const rows=getGrowthHistory().filter(v=>v.label===label);if(!rows.length){alert('No saved visits for this patient label.');return;}const cols=['label','date','sex','years','months','age','height','weight','bmi','hc'];const csv=[cols.join(','),...rows.map(v=>cols.map(k=>{const x=v[k]??'';return '"'+String(x).replace(/"/g,'""')+'"'}).join(','))].join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='growth-history.csv';a.click();URL.revokeObjectURL(url);}
   function deleteGrowthHistory(){const label=(document.getElementById('patientRecordId').value||'Unlabelled').trim();if(!confirm(`Delete all saved visits for “${label}” from this browser? This cannot be undone.`))return;setGrowthHistory(getGrowthHistory().filter(v=>v.label!==label));renderGrowthHistory();}
   document.addEventListener('DOMContentLoaded',()=>{const sel=document.getElementById('olderRef');if(sel)sel.value=olderRef;});
+  // Pre-filled link, e.g. growth.html?sex=male&years=2&months=6&height=88&weight=12.5&hc=48
+  document.addEventListener('DOMContentLoaded',()=>{
+    let q; try { q = new URLSearchParams(location.search); } catch (e) { return; }
+    if (![...q.keys()].length) return;
+    const num = (k, lo, hi) => { const v = parseFloat(q.get(k)); return Number.isFinite(v) && v >= lo && v <= hi ? v : null; };
+    const sex = (q.get('sex') || q.get('gender') || '').toLowerCase();
+    const g = document.getElementById('gender');
+    if (g && /^(m|male|boy)$/.test(sex)) g.value = 'male';
+    if (g && /^(f|female|girl)$/.test(sex)) g.value = 'female';
+    const ref = (q.get('ref') || '').toLowerCase();
+    if (ref === 'who2007' || ref === 'iap2015') { olderRef = ref; const s = document.getElementById('olderRef'); if (s) s.value = ref; }
+    let yrs = num('years', 0, 18), mos = num('months', 0, 11);
+    const am = num('age_months', 0, 216); if (am !== null) { yrs = Math.floor(am / 12); mos = am % 12; }
+    const set = (id, v) => { const el = document.getElementById(id); if (el && v !== null && !el.disabled) el.value = String(v); };
+    set('ageYears', yrs); set('ageMonths', mos);
+    try { syncAgeParts(); } catch (e) {}
+    set('height', num('height', 30, 220)); set('weight', num('weight', 1, 150)); set('hc', num('hc', 25, 65));
+    set('fatherHeight', num('father', 100, 250)); set('motherHeight', num('mother', 100, 250));
+    if (yrs !== null || mos !== null) { try { evaluateGrowth(false); } catch (e) {} }
+  });
   document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('patientRecordId');if(el)el.addEventListener('change',renderGrowthHistory);});
 
 
