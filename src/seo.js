@@ -3,7 +3,7 @@
 // (injects <head> tags into each HTML page at build time).
 
 // Change this one value if the domain changes.
-export const SITE_URL = 'https://growvita.pro';
+export const SITE_URL = 'https://growvita.app';
 export const SITE_NAME = 'GrowVita';
 export const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 

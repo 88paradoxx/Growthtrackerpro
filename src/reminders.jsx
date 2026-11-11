@@ -43,7 +43,7 @@ export function buildIcs(events, calName = 'GrowVita reminders') {
   for (const e of events) {
     lines.push(
       'BEGIN:VEVENT',
-      `UID:${e.uid}@growvita.pro`,
+      `UID:${e.uid}@growvita.app`,
       `DTSTAMP:${stamp}`,
       `DTSTART;VALUE=DATE:${ymd(e.date)}`,
       `DTEND;VALUE=DATE:${ymd(plusDays(e.date, 1))}`,
